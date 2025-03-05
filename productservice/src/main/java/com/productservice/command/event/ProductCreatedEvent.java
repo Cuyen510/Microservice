@@ -1,21 +1,13 @@
-package com.productservice.command.data;
+package com.productservice.command.event;
 
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
 
-@Entity
-@Table(name = "product")
 @Getter
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
-public class Product {
-    @Id
+public class ProductCreatedEvent {
     private String id;
 
     private String name;

@@ -1,33 +1,31 @@
-package com.productservice.command.command;
-
+package com.userservice.command.command;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.axonframework.modelling.command.TargetAggregateIdentifier;
 
-import java.util.List;
+import java.util.Date;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreateProductCommand {
+public class CreateUserCommand {
     @TargetAggregateIdentifier
     private String id;
 
-    private String name;
+    private String fullname;
 
-    private Float price;
+    private String phoneNumber;
 
-    private String thumbnail;
+    private String address;
 
-    private String description;
+    private String password;
 
-    private int stock;
+    private boolean active;
 
-    private String userId;
+    private Date dateOfBirth;
 
-    private String categoryId;
-
+    private String roleId;
 }

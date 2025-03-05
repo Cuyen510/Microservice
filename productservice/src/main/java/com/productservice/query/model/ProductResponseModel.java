@@ -1,12 +1,13 @@
-package com.productservice.command.event;
+package com.productservice.query.model;
 
 import lombok.Getter;
 import lombok.Setter;
 
+
 @Getter
 @Setter
-public class ProductCreateEvent {
-    private Long id;
+public class ProductResponseModel {
+    private String id;
 
     private String name;
 
@@ -18,5 +19,8 @@ public class ProductCreateEvent {
 
     private int stock;
 
-    private Long categoryId;
+    private String userId;
+
+    private String categoryId;
+
 }

@@ -1,21 +1,19 @@
-package com.productservice.command.data;
+package com.productservice.command.command;
 
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.axonframework.modelling.command.TargetAggregateIdentifier;
 
 import java.util.List;
 
-@Entity
-@Table(name = "product")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Product {
-    @Id
+public class UpdateProductCommand {
+    @TargetAggregateIdentifier
     private String id;
 
     private String name;

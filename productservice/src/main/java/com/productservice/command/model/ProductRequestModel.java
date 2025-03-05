@@ -3,10 +3,12 @@ package com.productservice.command.model;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 public class ProductRequestModel {
-    private Long id;
+    private String id;
 
     private String name;
 
@@ -18,5 +20,8 @@ public class ProductRequestModel {
 
     private int stock;
 
-    private Long categoryId;
+    private String userId;
+
+    private String categoryId;
+
 }
