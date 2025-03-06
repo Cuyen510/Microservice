@@ -1,20 +1,23 @@
-package com.userservice.command.command;
+package com.userservice.data;
 
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.axonframework.modelling.command.TargetAggregateIdentifier;
 
 import java.util.Date;
 
+@Entity
+@Table(name = "user")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UpdateUserCommand {
-    @TargetAggregateIdentifier
-    private String id;
+public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     private String fullname;
 
@@ -27,6 +30,4 @@ public class UpdateUserCommand {
     private boolean active;
 
     private Date dateOfBirth;
-
-    private String roleId;
 }
