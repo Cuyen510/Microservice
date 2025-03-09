@@ -29,7 +29,7 @@ public class ProductAggregate {
     private String description;
     private int stock;
     private String userId;
-    private String categoryId;
+    private Long categoryId;
 
     @CommandHandler
     public ProductAggregate(CreateProductCommand createProductCommand){

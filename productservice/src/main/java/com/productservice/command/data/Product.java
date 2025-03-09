@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
 
 @Entity
 @Table(name = "product")
@@ -18,18 +17,26 @@ public class Product {
     @Id
     private String id;
 
+    @Column(name = "name", nullable = false, length = 250)
     private String name;
 
+    @Column(name = "price")
     private Float price;
 
+    @Column(name = "thumbnail", length = 500)
     private String thumbnail;
 
+    @Column(name = "description")
     private String description;
 
+    @Column(name = "stock")
     private int stock;
 
+    @Column(name = "user_id")
     private String userId;
 
-    private String categoryId;
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Category category;
 
 }

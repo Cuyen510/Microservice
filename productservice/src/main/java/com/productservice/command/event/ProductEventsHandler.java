@@ -1,5 +1,6 @@
 package com.productservice.command.event;
 
+import com.productservice.command.data.CategoryRepository;
 import com.productservice.command.data.Product;
 import com.productservice.command.data.ProductRepository;
 import com.productservice.exceptions.DataNotFoundException;
@@ -12,10 +13,17 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class ProductEventsHandler {
     private final ProductRepository productRepository;
+    private final CategoryRepository categoryRepository;
     @EventHandler
-    public void on(ProductCreatedEvent event){
+    public void on(ProductCreatedEvent event) throws DataNotFoundException {
         Product product = new Product();
-        BeanUtils.copyProperties(event,product);
+        product.setName(event.getName());
+        product.setPrice(event.getPrice());
+        product.setThumbnail(event.getThumbnail());
+        product.setDescription(event.getDescription());
+        product.setStock(event.getStock());
+        product.setUserId(event.getUserId());
+        product.setCategory(categoryRepository.findById(event.getCategoryId()).orElseThrow(() -> new DataNotFoundException("Cant find category")));
         productRepository.save(product);
     }
 
@@ -28,7 +36,7 @@ public class ProductEventsHandler {
         product.setDescription(event.getDescription());
         product.setStock(event.getStock());
         product.setUserId(event.getUserId());
-        product.setCategoryId(event.getCategoryId());
+        product.setCategory(categoryRepository.findById(event.getCategoryId()).orElseThrow(() -> new DataNotFoundException("Cant find category")));
         productRepository.save(product);
     }
 

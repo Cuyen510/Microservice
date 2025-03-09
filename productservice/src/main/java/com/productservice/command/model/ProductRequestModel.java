@@ -22,6 +22,6 @@ public class ProductRequestModel {
 
     private String userId;
 
-    private String categoryId;
+    private Long categoryId;
 
 }

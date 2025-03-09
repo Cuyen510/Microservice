@@ -22,6 +22,6 @@ public class ProductUpdatedEvent {
 
     private String userId;
 
-    private String categoryId;
+    private Long categoryId;
 
 }
