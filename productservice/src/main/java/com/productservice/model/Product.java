@@ -1,10 +1,13 @@
-package com.productservice.command.data;
+package com.productservice.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.List;
 
 
 @Entity
@@ -15,7 +18,8 @@ import lombok.Setter;
 @NoArgsConstructor
 public class Product {
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Column(name = "name", nullable = false, length = 250)
     private String name;
@@ -33,10 +37,13 @@ public class Product {
     private int stock;
 
     @Column(name = "user_id")
-    private String userId;
+    private Long userId;
 
     @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;
 
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<ProductImage> productImages;
 }
