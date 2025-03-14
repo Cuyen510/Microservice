@@ -66,10 +66,6 @@ public class ProductService implements IProductService {
             existingProduct.setStock(productDTO.getStock());
             existingProduct.setUserId(productDTO.getUserId());
 
-            ProductImage productImage = new ProductImage();
-            productImage.setProduct(existingProduct);
-            productImage.setImageUrl(productDTO.getThumbnail());
-            productImageRepository.save(productImage);
             return productRepository.save(existingProduct);
         }
         return null;
@@ -96,6 +92,9 @@ public class ProductService implements IProductService {
                 .imageUrl(productImageDTO.getImageUrl())
                 .build();
         int size = productImageRepository.findByProductId(productId).size();
+        if(size == 0){
+            existingProduct.setThumbnail(productImageDTO.getImageUrl());
+        }
         if (size >= ProductImage.MAXIMUM_PER_PRODUCT){
             throw new InvalidParamException("number of image must be <=" +ProductImage.MAXIMUM_PER_PRODUCT);
         }
