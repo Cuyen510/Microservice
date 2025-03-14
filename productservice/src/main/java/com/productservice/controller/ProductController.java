@@ -5,6 +5,7 @@ import com.productservice.dto.ProductImageDTO;
 import com.productservice.model.Product;
 import com.productservice.model.ProductImage;
 import com.productservice.response.ProductResponse;
+import com.productservice.service.ProductProducerService.ProductProducerService;
 import com.productservice.service.ProductService.IProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ProductController {
     private final IProductService productService;
+    private final ProductProducerService productProducerService;
 
     @PostMapping("")
     public ResponseEntity<?> createProduct(
@@ -44,6 +46,7 @@ public class ProductController {
                         .toList();
                 return ResponseEntity.badRequest().body(errorMessages);
             }
+
             Product newProduct = productService.createProduct(productDTO);
             return ResponseEntity.ok(newProduct);
         } catch (Exception e) {
@@ -166,6 +169,13 @@ public class ProductController {
         productService.deleteProduct(id);
         return ResponseEntity.ok().body("Product deleted");
     }
+
+    @PostMapping("/send")
+    public String sendProduct(@RequestParam("message") String message) {
+        productProducerService.sendMessage(message);
+        return "Message sent successfully!";
+    }
+
 
 }
 

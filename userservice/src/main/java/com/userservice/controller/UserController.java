@@ -1,8 +1,8 @@
 package com.userservice.controller;
 
-import com.userservice.data.User;
+import com.userservice.model.User;
 import com.userservice.exceptions.DataNotFoundException;
-import com.userservice.model.UserDTO;
+import com.userservice.dto.UserDTO;
 import com.userservice.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

@@ -1,6 +1,6 @@
 package com.userservice.controller;
 
-import com.userservice.data.Role;
+import com.userservice.model.Role;
 import com.userservice.service.RoleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

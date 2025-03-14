@@ -1,7 +1,7 @@
 package com.userservice.service;
 
-import com.userservice.data.Role;
-import com.userservice.data.RoleRepository;
+import com.userservice.model.Role;
+import com.userservice.repository.RoleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

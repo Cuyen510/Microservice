@@ -1,9 +1,9 @@
 package com.userservice.service;
 
-import com.userservice.data.User;
-import com.userservice.data.UserRepository;
+import com.userservice.model.User;
+import com.userservice.repository.UserRepository;
 import com.userservice.exceptions.DataNotFoundException;
-import com.userservice.model.UserDTO;
+import com.userservice.dto.UserDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.dao.DataIntegrityViolationException;

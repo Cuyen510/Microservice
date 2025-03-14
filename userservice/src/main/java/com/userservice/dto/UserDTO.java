@@ -1,6 +1,6 @@
-package com.userservice.model;
+package com.userservice.dto;
 
-import com.userservice.data.User;
+import com.userservice.model.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
