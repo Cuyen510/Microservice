@@ -37,7 +37,6 @@ public class ProductService implements IProductService {
         newProduct.setCategory(existingCategory);
         newProduct.setStock(productDTO.getStock());
         newProduct.setUserId(productDTO.getUserId());
-
         return productRepository.save(newProduct);
     }
 
@@ -66,6 +65,11 @@ public class ProductService implements IProductService {
             existingProduct.setCategory(existingCategory);
             existingProduct.setStock(productDTO.getStock());
             existingProduct.setUserId(productDTO.getUserId());
+
+            ProductImage productImage = new ProductImage();
+            productImage.setProduct(existingProduct);
+            productImage.setImageUrl(productDTO.getThumbnail());
+            productImageRepository.save(productImage);
             return productRepository.save(existingProduct);
         }
         return null;

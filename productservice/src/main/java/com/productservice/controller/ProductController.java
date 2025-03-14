@@ -33,9 +33,10 @@ public class ProductController {
     private final IProductService productService;
     private final ProductProducerService productProducerService;
 
-    @PostMapping("")
+    @PostMapping(value = "", consumes =  MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> createProduct(
             @Valid @RequestBody ProductDTO productDTO,
+            @RequestParam("file") MultipartFile file,
             BindingResult result
     ) {
         try {
@@ -46,6 +47,7 @@ public class ProductController {
                         .toList();
                 return ResponseEntity.badRequest().body(errorMessages);
             }
+            productDTO.setThumbnail(storeFile(file));
 
             Product newProduct = productService.createProduct(productDTO);
             return ResponseEntity.ok(newProduct);
