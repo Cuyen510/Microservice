@@ -1,6 +1,9 @@
 package com.productservice.service.ProductProducerService;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.productservice.model.Product;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -18,6 +21,11 @@ public class ProductProducerService {
     public void sendMessage(String message) {
         kafkaTemplate.send(TOPIC,message );
         System.out.println("Sent: " + message);
+    }
+
+    public void sendProduct(Product product) throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        kafkaTemplate.send(TOPIC , objectMapper.writeValueAsString(product));
     }
 
 

@@ -41,5 +41,6 @@ public class UserController {
         userService.DeleteUser(id);
         return ResponseEntity.ok().body("User deleted");
     }
+    
 
 }

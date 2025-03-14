@@ -1,6 +1,5 @@
 package com.userservice.service;
 
-import com.userservice.dto.ProductEvent;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 

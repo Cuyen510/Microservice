@@ -1,7 +1,9 @@
 package com.productservice.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.productservice.dto.ProductDTO;
 import com.productservice.dto.ProductImageDTO;
+import com.productservice.exceptions.DataNotFoundException;
 import com.productservice.model.Product;
 import com.productservice.model.ProductImage;
 import com.productservice.response.ProductResponse;
@@ -33,10 +35,9 @@ public class ProductController {
     private final IProductService productService;
     private final ProductProducerService productProducerService;
 
-    @PostMapping(value = "", consumes =  MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "")
     public ResponseEntity<?> createProduct(
             @Valid @RequestBody ProductDTO productDTO,
-            @RequestParam("file") MultipartFile file,
             BindingResult result
     ) {
         try {
@@ -47,8 +48,6 @@ public class ProductController {
                         .toList();
                 return ResponseEntity.badRequest().body(errorMessages);
             }
-            productDTO.setThumbnail(storeFile(file));
-
             Product newProduct = productService.createProduct(productDTO);
             return ResponseEntity.ok(newProduct);
         } catch (Exception e) {
@@ -122,9 +121,9 @@ public class ProductController {
     ) {
         List<Product> productList = productService.getAllProducts(keyword, categoryId);
 
-        List<ProductResponse> products = new ArrayList<>();
+        List<ProductResponse> productResponseList = new ArrayList<>();
         productList.forEach(product -> {
-            products.add(ProductResponse.fromProduct(product));
+            productResponseList.add(ProductResponse.fromProduct(product));
         });
         return ResponseEntity.ok().body(productList);
     }
@@ -156,7 +155,7 @@ public class ProductController {
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateProduct(
-            @PathVariable long id,
+            @PathVariable Long id,
             @RequestBody ProductDTO productDTO) {
         try {
             Product updatedProduct = productService.updateProduct(id, productDTO);
@@ -175,7 +174,13 @@ public class ProductController {
     @PostMapping("/send")
     public String sendProduct(@RequestParam("message") String message) {
         productProducerService.sendMessage(message);
-        return "Message sent successfully!";
+        return "Message sent successfully";
+    }
+
+    @PostMapping("/sendProduct")
+    public String sendProduct(@RequestParam("id") Long id) throws DataNotFoundException, JsonProcessingException {
+        productProducerService.sendProduct(productService.getProductById(id));
+        return "Product sent successfully";
     }
 
 
