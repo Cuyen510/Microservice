@@ -12,6 +12,9 @@ import com.productservice.repository.ProductImageRepository;
 import com.productservice.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -47,10 +50,15 @@ public class ProductService implements IProductService {
     }
 
     @Override
-    public List<Product> getAllProducts(String keyword, Long categoryId) {
-       return productRepository.searchProducts(categoryId, keyword);
+    public List<Product> getAllProducts() {
+       return productRepository.findAll();
     }
 
+    @Override
+    public Page<Product> searchProduct(String keyword, Long categoryId, PageRequest pageRequest) {
+        Page<Product> products = productRepository.searchProducts(categoryId, keyword, pageRequest);
+        return products;
+    }
     @Override
     public Product updateProduct(Long id, ProductDTO productDTO) throws DataNotFoundException {
         Product existingProduct = getProductById(id);

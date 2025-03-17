@@ -6,6 +6,9 @@ import com.productservice.exceptions.DataNotFoundException;
 import com.productservice.exceptions.InvalidParamException;
 import com.productservice.model.Product;
 import com.productservice.model.ProductImage;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+
 
 import java.util.List;
 
@@ -14,7 +17,9 @@ public interface IProductService {
 
     Product getProductById(Long id) throws DataNotFoundException;
 
-    List<Product> getAllProducts(String keyword, Long categoryId);
+    List<Product> getAllProducts();
+
+    Page<Product> searchProduct(String keyword, Long categoryId, PageRequest pageRequest);
 
     Product updateProduct(Long id, ProductDTO productDTO) throws DataNotFoundException;
 

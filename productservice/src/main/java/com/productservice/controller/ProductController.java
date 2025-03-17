@@ -6,11 +6,16 @@ import com.productservice.dto.ProductImageDTO;
 import com.productservice.exceptions.DataNotFoundException;
 import com.productservice.model.Product;
 import com.productservice.model.ProductImage;
+import com.productservice.response.ProductListResponse;
 import com.productservice.response.ProductResponse;
 import com.productservice.service.ProductProducerService.ProductProducerService;
 import com.productservice.service.ProductService.IProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.UrlResource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -114,18 +119,48 @@ public class ProductController {
         return contentType.startsWith("image/");
     }
 
+    @GetMapping("/images/{imageName}")
+    public ResponseEntity<?> viewImage(@PathVariable String imageName) {
+        try {
+            java.nio.file.Path imagePath = Paths.get("uploads/"+imageName);
+            UrlResource resource = new UrlResource(imagePath.toUri());
+
+            if (resource.exists()) {
+                return ResponseEntity.ok()
+                        .contentType(MediaType.IMAGE_JPEG)
+                        .body(resource);
+            } else {
+                return ResponseEntity.ok()
+                        .contentType(MediaType.IMAGE_JPEG)
+                        .body(new UrlResource(Paths.get("uploads/notfound.jpg").toUri()));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     @GetMapping("")
     public ResponseEntity<?> getProducts(
             @RequestParam(defaultValue = "") String keyword,
-            @RequestParam(defaultValue = "0", name = "category_id") Long categoryId
+            @RequestParam(defaultValue = "0", name = "category_id") Long categoryId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int limit
     ) {
-        List<Product> productList = productService.getAllProducts(keyword, categoryId);
-
-        List<ProductResponse> productResponseList = new ArrayList<>();
-        productList.forEach(product -> {
-            productResponseList.add(ProductResponse.fromProduct(product));
+        PageRequest pageRequest = PageRequest.of(
+                page, limit,
+                Sort.by("id").ascending()
+        );
+        Page<Product> productPage = productService.searchProduct(keyword, categoryId, pageRequest);
+        int totalPages = productPage.getTotalPages();
+        List<ProductResponse> products = new ArrayList<>();
+        productPage.forEach(product -> {
+            products.add(ProductResponse.fromProduct(product));
         });
-        return ResponseEntity.ok().body(productList);
+        return ResponseEntity.ok(ProductListResponse
+                .builder()
+                .products(products)
+                .totalPages(totalPages)
+                .build());
     }
 
     @GetMapping("/{id}")
