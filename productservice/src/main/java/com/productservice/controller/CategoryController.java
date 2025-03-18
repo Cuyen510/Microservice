@@ -34,7 +34,10 @@ public class CategoryController {
         }
         Category category = categoryService.createCategory(categoryDTO);
         categoryResponse.setCategory(category);
-        return ResponseEntity.ok(categoryResponse);
+        return ResponseEntity.ok(CategoryResponse.builder()
+                .message("Category added")
+                .category(category)
+                .build());
     }
     
     @GetMapping("")

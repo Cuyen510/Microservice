@@ -17,9 +17,9 @@ public interface IProductService {
 
     Product getProductById(Long id) throws DataNotFoundException;
 
-    List<Product> getAllProducts();
+    Page<Product> getAllProducts(PageRequest pageRequest);
 
-    Page<Product> searchProduct(String keyword, Long categoryId, PageRequest pageRequest);
+    Page<Product> searchProduct( Long categoryId, String keyword,PageRequest pageRequest);
 
     Product updateProduct(Long id, ProductDTO productDTO) throws DataNotFoundException;
 

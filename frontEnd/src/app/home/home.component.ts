@@ -17,12 +17,15 @@ import { HttpClient } from '@angular/common/http';
   styleUrl: './home.component.scss'
 })
 export class HomeComponent implements OnInit {
-    products: Product[] = [];
-    categories: Category[] = []; 
-    selectedCategoryId: number  = 0; 
-    currentPage: number = 0;
-    itemsPerPage: number = 12;
-    keyword:string = "";
+  products: Product[] = [];
+  categories: Category[] = []; 
+  selectedCategoryId: number  = 0; 
+  currentPage: number = 0;
+  itemsPerPage: number = 10;
+  pages: number[] = [];
+  totalPages:number = 0;
+  visiblePages: number[] = [];
+  keyword:string = "";
   
     constructor(
       private http: HttpClient,
@@ -32,7 +35,7 @@ export class HomeComponent implements OnInit {
       ) {}
   
     ngOnInit() {
-      this.getProducts(this.keyword, this.selectedCategoryId, 0, this.itemsPerPage);
+      this.getProducts(0, this.itemsPerPage);
       this.getCategories();
     }
     getCategories() {
@@ -49,25 +52,61 @@ export class HomeComponent implements OnInit {
         }
       });
     }
+   
+
     searchProducts() {
-      debugger
-      this.getProducts(this.keyword, this.selectedCategoryId, this.currentPage, this.itemsPerPage );
+      if(this.keyword == "" && this.selectedCategoryId == 0){
+        this.getProducts(this.currentPage, this.itemsPerPage)
+      }else{
+        this.products = [];
+        debugger
+        this.productService.searchProducts(this.keyword, this.selectedCategoryId, this.currentPage, this.itemsPerPage).subscribe(res =>{
+          res.products.forEach(element =>{
+            element.url = `${environment.apiBaseUrl}/products/images/${element.thumbnail}`;
+            this.products.push(element);
+            this.totalPages = res.totalPages;
+            this.visiblePages = this.generateVisiblePageArray(this.currentPage, this.totalPages);
+            });
+        });    
+      }
     }
 
-    getProducts(keyword: string, selectedCategoryId: number, page: number, itemsPerPage: number) {
+    getProducts(page: number, itemsPerPage: number) {
       this.products = [];
       debugger
-      this.productService.getProducts(keyword, selectedCategoryId, page, itemsPerPage).subscribe(res =>{
+      this.productService.getProducts(page, itemsPerPage).subscribe(res =>{
         res.products.forEach(element =>{
           element.url = `${environment.apiBaseUrl}/products/images/${element.thumbnail}`;
           this.products.push(element);
+          this.totalPages = res.totalPages;
+          this.visiblePages = this.generateVisiblePageArray(this.currentPage, this.totalPages);
         });
       });    
     }
+
+    onPageChange(page: number) {
+    debugger;
+    this.currentPage = page;
+    this.searchProducts();
+    }
+
+    generateVisiblePageArray(currentPage: number, totalPages: number): number[] {
+      const maxVisiblePages = 5;
+      const halfVisiblePages = Math.floor(maxVisiblePages / 2);
+
+      let startPage = Math.max(currentPage - halfVisiblePages, 1);
+      let endPage = Math.min(startPage + maxVisiblePages - 1, totalPages);
+
+      if (endPage - startPage + 1 < maxVisiblePages) {
+        startPage = Math.max(endPage - maxVisiblePages + 1, 1);
+      }
+
+      return new Array(endPage - startPage + 1).fill(0).map((_, index) => startPage + index);
+    }
+      
     
-   
     onProductClick(productId: number) {
       debugger
       this.router.navigate(['/products', productId]);
     }  
-  }
+}

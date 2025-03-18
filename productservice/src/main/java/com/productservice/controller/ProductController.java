@@ -139,23 +139,46 @@ public class ProductController {
         }
     }
 
-    @GetMapping("")
-    public ResponseEntity<?> getProducts(
+    @GetMapping("/search")
+    public ResponseEntity<?> searchProducts(
             @RequestParam(defaultValue = "") String keyword,
             @RequestParam(defaultValue = "0", name = "category_id") Long categoryId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int limit
     ) {
+        keyword = (keyword == null) ? "" : keyword;
         PageRequest pageRequest = PageRequest.of(
                 page, limit,
                 Sort.by("id").ascending()
         );
-        Page<Product> productPage = productService.searchProduct(keyword, categoryId, pageRequest);
+        Page<Product> productPage = productService.searchProduct(categoryId, keyword, pageRequest);
         int totalPages = productPage.getTotalPages();
-        List<ProductResponse> products = new ArrayList<>();
-        productPage.forEach(product -> {
-            products.add(ProductResponse.fromProduct(product));
-        });
+        List<ProductResponse> products = productPage.getContent()
+                .stream()
+                .map(ProductResponse::fromProduct)
+                .toList();
+        return ResponseEntity.ok(ProductListResponse
+                .builder()
+                .products(products)
+                .totalPages(totalPages)
+                .build());
+    }
+
+    @GetMapping("")
+    public ResponseEntity<?> getAllProducts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int limit)
+    {
+        PageRequest pageRequest = PageRequest.of(
+                page, limit,
+                Sort.by("id").ascending()
+        );
+        Page<Product> productPage = productService.getAllProducts(pageRequest);
+        int totalPages = productPage.getTotalPages();
+        List<ProductResponse> products = productPage.getContent()
+                .stream()
+                .map(ProductResponse::fromProduct)
+                .toList();
         return ResponseEntity.ok(ProductListResponse
                 .builder()
                 .products(products)
