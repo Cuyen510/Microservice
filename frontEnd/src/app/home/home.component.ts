@@ -7,10 +7,12 @@ import { CategoryService } from '../service/category.service';
 import { environment } from '../environment/environment';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-home',
   imports: [CommonModule, FormsModule],
+  standalone: true,
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
@@ -23,6 +25,7 @@ export class HomeComponent implements OnInit {
     keyword:string = "";
   
     constructor(
+      private http: HttpClient,
       private productService: ProductService,
       private categoryService: CategoryService,    
       private router: Router,   
