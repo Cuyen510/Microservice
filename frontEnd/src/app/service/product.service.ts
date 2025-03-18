@@ -12,11 +12,21 @@ import { ProductListResponse } from '../response/product/product.list.response';
   providedIn: 'root', 
 })
 export class ProductService {
-  private apiGetProducts = `${environment.apiBaseUrl}`
   private apiBaseUrl = environment.apiBaseUrl;
   constructor(private http : HttpClient) { }
 
   getProducts(
+    page: number,
+    limit: number
+  ): Observable<ProductListResponse> {
+    const params = {
+      page: page,
+      limit: limit
+    };
+    return this.http.get<ProductListResponse>(`${this.apiBaseUrl}/products`, { params });
+  }
+
+  searchProducts(
     keyword: string,
     categoryId: number,
     page: number,
@@ -28,7 +38,7 @@ export class ProductService {
       page: page,
       limit: limit
     };
-    return this.http.get<ProductListResponse>(`${this.apiGetProducts}/products`, { params });
+    return this.http.get<ProductListResponse>(`${this.apiBaseUrl}/products/search`, { params });
   }
 
   getDetailProduct(productId: number): Observable<ApiResponse> {
