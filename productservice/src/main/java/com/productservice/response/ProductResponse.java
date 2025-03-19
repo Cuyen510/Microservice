@@ -16,6 +16,9 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProductResponse{
+    @JsonProperty("id")
+    private Long id;
+
     @JsonProperty("name")
     private String name;
 
@@ -42,6 +45,7 @@ public class ProductResponse{
 
     public static ProductResponse fromProduct(Product product){
         return ProductResponse.builder()
+                .id(product.getId())
                 .name(product.getName())
                 .price(product.getPrice())
                 .thumbnail(product.getThumbnail())

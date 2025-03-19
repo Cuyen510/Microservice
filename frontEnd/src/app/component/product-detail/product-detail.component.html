@@ -1,0 +1,66 @@
+<div class="container">
+    <div class="intro-section">
+        <h1>Product detail</h1>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+          <div id="carousel" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner">
+              @for(image of product?.product_images;
+                  track image.id;let i = $index;) {
+                <div 
+                   class="carousel-item" 
+                    [ngClass]="{'active': i === currentImageIndex}">
+                  <div class="square-image">
+                    <img [src]="image.imageUrl" class="product-image" alt="Product Image">
+                  </div> 
+                </div>
+              }             
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" 
+                    data-bs-slide="prev" (click)="previousImage()">
+              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" 
+                    data-bs-slide="next" (click)="nextImage()">
+              <span class="carousel-control-next-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Next</span>
+            </button>
+          </div>
+          <div class="row">
+            <div class="thumbnail-container">
+              @for(image of product?.product_images; 
+                   track image.imageUrl; let i = $index) {
+                    <div 
+                      class="thumbnail-item" 
+                      [ngClass]="{'active': i === currentImageIndex}"
+                      (click)="thumbNailClick(i)">
+                    <img [src]="image.imageUrl" class="thumbnail-image" alt="Thumbnail Image">
+                  </div>
+              }
+              
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+            <div class="product-detail">
+              <h2>{{ product?.name }}</h2>
+              <p>Description: {{ product?.description }}</p>
+              <p>Price: ${{ product?.price }}</p>
+              <p>Total: ${{ getTotalPrice() | number:'1.2-2' }}</p>
+              <div class="product-actions">
+                <button class="btn btn-primary">Add to cart</button>
+                <button class="btn btn-success">Buy now</button>
+              </div>
+                <div class="product-quantity">
+                  <div class="border-wrapper">
+                    <button (click)="decreaseQuantity()">-</button>
+                    <input type="text" [value]="quantity">
+                    <button (click)="increaseQuantity()">+</button>
+                  </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

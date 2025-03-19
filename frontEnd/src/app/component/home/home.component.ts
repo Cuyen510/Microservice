@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { Product } from '../model/product';
-import { Category } from '../model/category';
-import { ProductService } from '../service/product.service';
+import { Product } from '../../model/product';
+import { Category } from '../../model/category';
+import { ProductService } from '../../service/product.service';
 import { Router } from '@angular/router';
-import { CategoryService } from '../service/category.service';
-import { environment } from '../environment/environment';
+import { CategoryService } from '../../service/category.service';
+import { environment } from '../../environment/environment';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
