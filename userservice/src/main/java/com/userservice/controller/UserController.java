@@ -1,8 +1,10 @@
 package com.userservice.controller;
 
+import com.userservice.dto.UserLoginDTO;
 import com.userservice.model.User;
 import com.userservice.exceptions.DataNotFoundException;
 import com.userservice.dto.UserDTO;
+import com.userservice.response.UserLoginResponse;
 import com.userservice.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,14 +16,14 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     private final UserService userService;
 
-    @PostMapping
+    @PostMapping("/register")
     public ResponseEntity<User> addUser(@RequestBody UserDTO userDTO){
         return ResponseEntity.ok().body(userService.addUser(userDTO));
     }
 
     @PostMapping("/login")
-    public String login(@RequestBody UserDTO userDTO) throws DataNotFoundException {
-        return userService.login(userDTO.getPhoneNumber(), userDTO.getPassword());
+    public ResponseEntity<UserLoginResponse> login(@RequestBody UserLoginDTO userLoginDTO) throws DataNotFoundException {
+        return ResponseEntity.ok().body(userService.login(userLoginDTO.getPhoneNumber(), userLoginDTO.getPassword()));
     }
 
     @GetMapping("/{id}")

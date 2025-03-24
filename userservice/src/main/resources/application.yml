@@ -1,0 +1,46 @@
+spring:
+  application:
+    name: userservice
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/userservice
+    username: root
+    password:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format-sql: true
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: product-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringDeserializer
+    topic:
+      validateUser: validate-user-request
+      validateUserResponse: validate-user-response
+
+  security:
+    jwt:
+      secret: asdbsakjdbsjkacbacnlasknckjscnkjscbascscxsacasacadasd
+
+
+
+  server:
+    port: 9002
+
+  eureka:
+    client:
+      service-url:
+        defaultZone: http://localhost:8761/eureka

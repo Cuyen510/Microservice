@@ -1,19 +1,30 @@
 package com.userservice.service;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
 import com.userservice.model.User;
 import com.userservice.repository.UserRepository;
 import com.userservice.exceptions.DataNotFoundException;
 import com.userservice.dto.UserDTO;
+import com.userservice.response.UserLoginResponse;
 import lombok.RequiredArgsConstructor;
+import org.bouncycastle.math.ec.rfc8032.Ed448;
 import org.springframework.beans.BeanUtils;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Date;
 
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+
+    private final PasswordEncoder passwordEncoder;
+
+
 
     public User addUser(UserDTO userDTO){
         String phoneNumber = userDTO.getPhoneNumber();
@@ -29,15 +40,20 @@ public class UserService {
         return userRepository.findById(id).orElseThrow(() -> new DataNotFoundException("Can't find user with id:" + id));
     }
 
-    public String login(String phoneNumber, String password) throws DataNotFoundException {
+    public UserLoginResponse login(String phoneNumber, String password) throws DataNotFoundException {
         User user = userRepository.findByPhoneNumber(phoneNumber).orElseThrow(()->new DataNotFoundException("Wrong phone number or password"));
-        if(!password.equals(user.getPassword())){
+        if(!passwordEncoder.matches(password, user.getPassword())){
             throw new DataNotFoundException("Wrong phone number or password");
+        }else{
+            Algorithm algorithm = Algorithm.HMAC256("secret".getBytes());
+            String access_token = JWT.create()
+                    .withSubject(user.getPhoneNumber())
+                    .withExpiresAt(new Date(System.currentTimeMillis()+ (24*60*60*1000)))
+                    .sign(algorithm);
+            return UserLoginResponse.builder()
+                    .access_token(access_token)
+                    .build();
         }
-        if(!user.isActive()){
-            return "Account not available";
-        }
-        return "Login successful";
     }
 
     public User updateUser(Long id, UserDTO userDTO) throws DataNotFoundException {

@@ -2,6 +2,18 @@
     port:
       9000
 
+  security:
+    jwt:
+      secret: asdbsakjdbsjkacbacnlasknckjscnkjscbascscxsacasacadasd
+
+  kafka:
+    topic:
+      validateUser: validate-user-request
+      validateUserResponse: validate-user-response
+    bootstrap-servers: localhost:9092
+
+
+
   spring:
     application:
       name: api-gateway
@@ -11,19 +23,17 @@
           - id: productservice
             uri: http://localhost:9001
             predicates:
-              - Path=/api/v1/products/**
-            filter:
+              - Path=/api/v1/products/**, /api/v1/categories/**
+            filters:
               - AuthFilter
-          - id: categoryservice
-            uri: http://localhost:9001
-            predicates:
-              - Path=/api/v1/categories/**
-            filter:
-              - AuthFilter
+
           - id: userservice
             uri: http://localhost:9002
             predicates:
-              - Path=/api/v1/users/**
+              - Path=/api/v1/users/login, /api/v1/users/register, /api/v1/roles
+            filters:
+              - AuthFilter
+
         default-filters:
           - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
         globalcors:
@@ -32,5 +42,4 @@
               allowedOrigins: "*"
               allowedMethods: "*"
               allowedHeaders: "*"
-
 
