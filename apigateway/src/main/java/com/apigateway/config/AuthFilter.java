@@ -60,7 +60,7 @@ public class AuthFilter extends AbstractGatewayFilterFactory<AuthFilter.Config> 
                 Date expirationDate = decodedJWT.getExpiresAt();
 
                 if (username == null || username.isEmpty() || expirationDate.before(new Date())) {
-                    throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid token payload");
+                    throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid token");
                 }
 
                 CompletableFuture<Boolean> future = new CompletableFuture<>();
@@ -89,6 +89,7 @@ public class AuthFilter extends AbstractGatewayFilterFactory<AuthFilter.Config> 
 
     @KafkaListener(topics = "${kafka.topic.validateUserResponse}", groupId = "gateway-group")
     public void listenValidationResponse(String message) {
+        System.out.println(message);
         String[] parts = message.split(":");
         String username = parts[0];
         boolean isValid = Boolean.parseBoolean(parts[1]);

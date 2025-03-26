@@ -1,4 +1,4 @@
-package com.userservice.config;
+package com.apigateway.config;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -22,7 +22,7 @@ public class KafkaConfig {
         Map<String, Object> config = new HashMap<>();
 
         config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-        config.put(ConsumerConfig.GROUP_ID_CONFIG, "user-service-group");
+        config.put(ConsumerConfig.GROUP_ID_CONFIG, "gateway-group");
         config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         config.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
@@ -53,3 +53,4 @@ public class KafkaConfig {
         return new KafkaTemplate<>(producerFactory());
     }
 }
+

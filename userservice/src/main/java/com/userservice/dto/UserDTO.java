@@ -1,5 +1,6 @@
 package com.userservice.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.userservice.model.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,18 +15,20 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserDTO {
-    private Long id;
+    @JsonProperty("fullname")
+    private String fullName;
 
-    private String fullname;
-
+    @JsonProperty("phone_number")
     private String phoneNumber;
 
     private String address;
 
     private String password;
 
-    private boolean active;
+    @JsonProperty("retype_password")
+    private String retypePassword;
 
+    @JsonProperty("date_of_birth")
     private Date dateOfBirth;
 
     public static UserDTO entityToDTO(User user){
@@ -36,7 +39,10 @@ public class UserDTO {
 
     public static User dtoToEntity(UserDTO userDTO){
         User user = new User();
-        BeanUtils.copyProperties(userDTO, user);
+        user.setFullname(userDTO.getFullName());
+        user.setAddress(userDTO.getAddress());
+        user.setPhoneNumber(userDTO.getPhoneNumber());
+        user.setDateOfBirth(userDTO.getDateOfBirth());
         return user;
     }
 }

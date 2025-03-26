@@ -9,8 +9,6 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.function.Function;
 
 @Service
 @RequiredArgsConstructor
@@ -18,10 +16,10 @@ public class ValidateTokenService {
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final UserRepository userRepository;
 
-    @KafkaListener(topics = "${kafka.topic.validateUser}", groupId = "user-service-group")
+    @KafkaListener(topics = "validate-user-request", groupId = "user-service-group")
     public void validateToken(String username) {
         boolean exists = userRepository.existsByPhoneNumber(username);
-        kafkaTemplate.send("${kafka.topic.validateUserResponse}", username + ":" + exists);
+        kafkaTemplate.send("validate-user-response", username + ":" + exists);
     }
 
 

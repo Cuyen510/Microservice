@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/v1/users")
@@ -29,6 +31,11 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<User> getUserDetails(@PathVariable Long id) throws DataNotFoundException {
         return ResponseEntity.ok().body(userService.getUserDetails(id));
+    }
+
+    @GetMapping("")
+    public ResponseEntity<List<User>> getAllUsers(@PathVariable Long id) throws DataNotFoundException {
+        return ResponseEntity.ok().body(userService.getAllUsers());
     }
 
 
