@@ -62,8 +62,14 @@ public class UserService {
                     .withSubject(user.getPhoneNumber())
                     .withExpiresAt(new Date(System.currentTimeMillis()+ (24*60*60*1000)))
                     .sign(algorithm);
+//            String refresh_token = JWT.create()
+//                    .withSubject(user.getPhoneNumber())
+//                    .withExpiresAt(new Date(System.currentTimeMillis()+ (7*24*60*60*1000)))
+//                    .sign(algorithm);
+//            user.setRefresh_token(refresh_token);
             return UserLoginResponse.builder()
                     .access_token(access_token)
+                    .user(user)
                     .build();
         }
     }

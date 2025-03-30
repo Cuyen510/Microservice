@@ -1,5 +1,6 @@
 package com.userservice.response;
 
+import com.userservice.model.User;
 import lombok.*;
 
 @Getter
@@ -9,4 +10,6 @@ import lombok.*;
 @Builder
 public class UserLoginResponse {
     private String access_token;
+
+    private User user;
 }

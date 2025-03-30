@@ -37,6 +37,9 @@ public class User {
     @Column(name = "date_of_birth")
     private Date dateOfBirth;
 
+//    @Column(name = "refresh_token")
+//    private String refresh_token;
+
     @ManyToOne
     @JoinColumn(name = "role_id")
     private Role role;

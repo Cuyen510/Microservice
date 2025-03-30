@@ -1,0 +1,68 @@
+.container{
+    height: 120vh;
+}
+.register-form{
+    border-radius: 10px;
+    padding: 20px;
+    max-width: 500px;
+    align-items: center;
+}
+.register-header{
+    text-align: center;
+    margin-bottom: 20px;
+    
+}
+
+.form-group{
+    border-radius: 10px;
+    background-color: white;
+    box-shadow: 0 0 10px;
+    padding: 10px;
+    align-items: center;
+}
+
+label{
+    font-weight: 700;
+}
+
+.divider-nospace{
+    border-top: 1px solid black;
+}
+
+.password-field{
+    position: relative;
+}
+.password-toggle{
+    position: absolute;
+    top: 60%;
+    right: 10px;
+    cursor: pointer;
+
+}
+
+.checkbox-text{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+}
+.form-check-label{
+    font-weight: 400;
+}
+
+.btn-primary{
+    max-width: 200px;
+    margin:20px 0 0 120px ;
+    width: 100%;
+    border-radius: 30px;
+}
+
+.access-right{
+    width: 200px;
+}
+
+.divider{
+    height: 1px;
+    background-color: black;
+    margin: 20px;
+}

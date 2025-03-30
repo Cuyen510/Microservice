@@ -57,9 +57,8 @@ public class AuthFilter extends AbstractGatewayFilterFactory<AuthFilter.Config> 
                 Algorithm algorithm = Algorithm.HMAC256(jwtSecret.getBytes());
                 DecodedJWT decodedJWT = JWT.require(algorithm).build().verify(token);
                 String username = decodedJWT.getSubject();
-                Date expirationDate = decodedJWT.getExpiresAt();
 
-                if (username == null || username.isEmpty() || expirationDate.before(new Date())) {
+                if (username == null || username.isEmpty()) {
                     throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid token");
                 }
 

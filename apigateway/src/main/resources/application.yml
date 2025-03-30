@@ -33,8 +33,6 @@
             uri: http://localhost:9001
             predicates:
               - Path=/api/v1/products/**, /api/v1/categories/**
-            filters:
-              - AuthFilter
 
           - id: user-public-routes
             uri: http://localhost:9002

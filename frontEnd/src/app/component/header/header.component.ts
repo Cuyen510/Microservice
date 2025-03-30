@@ -1,8 +1,10 @@
 import { AfterViewInit, Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import * as bootstrap from 'bootstrap';
+import { TokenService } from '../../service/token.service';
+
+
 
 
 @Component({
@@ -15,14 +17,24 @@ import * as bootstrap from 'bootstrap';
     RouterModule
   ]
 })
-export class HeaderComponent implements AfterViewInit {
-  ngAfterViewInit(): void {
-    const dropdownElementList = document.querySelectorAll('.dropdown-toggle');
-    dropdownElementList.forEach(dropdownEl => {
-      new bootstrap.Dropdown(dropdownEl);
-    });
+export class HeaderComponent  {
+  isLoggedIn: boolean = false; 
+  username: string = '';
+
+  constructor(private tokenService: TokenService) { 
+    this.checkLoginStatus();
   }
 
-  
+  checkLoginStatus() {
+    this.isLoggedIn = !this.tokenService.isTokenExpired(); 
+    if (this.isLoggedIn) {
+      this.username = this.tokenService.getUser().phoneNumber; 
+    }
+  }
+
+  logout() {
+    this.tokenService.LogOut();
+    this.isLoggedIn = false;
+  }
 
 }
