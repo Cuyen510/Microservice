@@ -6,8 +6,11 @@ import com.userservice.exceptions.DataNotFoundException;
 import com.userservice.dto.UserDTO;
 import com.userservice.response.UserLoginResponse;
 import com.userservice.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,27 +32,41 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserDetails(@PathVariable Long id) throws DataNotFoundException {
+    public ResponseEntity<?> getUserDetails(@PathVariable Long id,  HttpServletRequest request) throws DataNotFoundException {
+        String role = request.getHeader("X-auth-role");
+        Long userId = Long.valueOf(request.getHeader("X-auth-userId"));
+        if(!role.equals("admin")|| role == null)
+            if(!userId.equals(id)){
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("UnAuthorize");
+            }
         return ResponseEntity.ok().body(userService.getUserDetails(id));
     }
 
     @GetMapping("")
-    public ResponseEntity<List<User>> getAllUsers(@PathVariable Long id) throws DataNotFoundException {
+    public ResponseEntity<?> getAllUsers(HttpServletRequest request) throws DataNotFoundException {
+        String role = request.getHeader("X-auth-role");
+        if(!role.equals("admin")|| role == null)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("UnAuthorize");
         return ResponseEntity.ok().body(userService.getAllUsers());
     }
 
-
-
     @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id,@RequestBody UserDTO userDTO) throws DataNotFoundException {
+    public ResponseEntity<?> updateUser(@PathVariable Long id,@RequestBody UserDTO userDTO, HttpServletRequest request) throws DataNotFoundException {
+        String role = request.getHeader("X-auth-role");
+        Long userId = Long.valueOf(request.getHeader("X-auth-userId"));
+        if(!role.equals("admin")|| role == null)
+            if(!userId.equals(id)){
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("UnAuthorize");
+            }
         return ResponseEntity.ok().body(userService.updateUser(id, userDTO));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteUser(@PathVariable Long id){
+    public ResponseEntity<String> deleteUser(@PathVariable Long id, HttpServletRequest request){
+        String role = request.getHeader("X-auth-role");
+        if(!role.equals("admin")|| role == null)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("UnAuthorize");
         userService.DeleteUser(id);
         return ResponseEntity.ok().body("User deleted");
     }
-    
-
 }

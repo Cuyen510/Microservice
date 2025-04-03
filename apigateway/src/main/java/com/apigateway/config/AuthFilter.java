@@ -15,8 +15,6 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 
-
-import java.util.Date;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -57,8 +55,10 @@ public class AuthFilter extends AbstractGatewayFilterFactory<AuthFilter.Config> 
                 Algorithm algorithm = Algorithm.HMAC256(jwtSecret.getBytes());
                 DecodedJWT decodedJWT = JWT.require(algorithm).build().verify(token);
                 String username = decodedJWT.getSubject();
+                String role = decodedJWT.getClaim("role").asString();
+                String userId = decodedJWT.getClaim("userId").asString();
 
-                if (username == null || username.isEmpty()) {
+                if (username == null || username.isEmpty() || role == null) {
                     throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid token");
                 }
 
@@ -73,7 +73,9 @@ public class AuthFilter extends AbstractGatewayFilterFactory<AuthFilter.Config> 
                 }
 
                 ServerHttpRequest request = exchange.getRequest().mutate()
-                        .header("X-auth-username", username)
+                        .header("X-auth-user", username)
+                        .header("X-auth-userId", userId)
+                        .header("X-auth-role", role)
                         .build();
                 return chain.filter(exchange.mutate().request(request).build());
 

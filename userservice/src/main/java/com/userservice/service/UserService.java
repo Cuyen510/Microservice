@@ -14,9 +14,11 @@ import org.bouncycastle.math.ec.rfc8032.Ed448;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.util.Date;
 import java.util.List;
 
@@ -60,13 +62,19 @@ public class UserService {
             Algorithm algorithm = Algorithm.HMAC256(jwtSecret.getBytes());
             String access_token = JWT.create()
                     .withSubject(user.getPhoneNumber())
+                    .withClaim("role", user.getRole().getName())
+                    .withClaim("userId", user.getId().toString())
                     .withExpiresAt(new Date(System.currentTimeMillis()+ (24*60*60*1000)))
                     .sign(algorithm);
+
+
 //            String refresh_token = JWT.create()
 //                    .withSubject(user.getPhoneNumber())
+//                    .withClaim("role", user.getRole().getName())
+//                    .withClaim("userId", user.getId().toString())
 //                    .withExpiresAt(new Date(System.currentTimeMillis()+ (7*24*60*60*1000)))
 //                    .sign(algorithm);
-//            user.setRefresh_token(refresh_token);
+
             return UserLoginResponse.builder()
                     .access_token(access_token)
                     .user(user)
