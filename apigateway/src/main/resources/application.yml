@@ -8,7 +8,7 @@
   kafka:
     topic:
       validateUser: validate-user-request
-      validateUserResponse: validate-user-response
+      validateUserResponse:
     bootstrap-servers: localhost:9092
     consumer:
       group-id: gateway-group
