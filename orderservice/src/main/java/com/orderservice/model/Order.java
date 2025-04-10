@@ -19,13 +19,14 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long userId;
+    @Column(name = "seller_id")
+    private Long sellerId;
+
+    @Column(name = "buyer_id")
+    private Long buyerId;
 
     @Column(name = "fullname", nullable = false, length = 100)
     private String fullname;
-
-    @Column(name = "email", nullable = false, length = 100)
-    private String email;
 
     @Column(name = "phone_number", nullable = false, length = 10)
     private String phoneNumber;

@@ -5,50 +5,32 @@ import com.orderservice.dto.OrderDTO;
 import com.orderservice.exceptions.DataNotFoundException;
 import com.orderservice.model.Order;
 import com.orderservice.model.OrderDetail;
+import com.orderservice.model.OrderStatus;
 import com.orderservice.repository.OrderRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
-import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.*;
+
 
 @Service
 @RequiredArgsConstructor
 public class OrderService {
     private final OrderRepository orderRepository;
 
-    private final KafkaTemplate<String, Long> kafkaTemplate;
-    private final ConcurrentHashMap<String, CompletableFuture<Boolean>> validationResults = new ConcurrentHashMap<>();
-    @Value("${kafka.topic.validateUser}")
-    private String validateUserTopic;
-
-    CompletableFuture<Boolean> future = new CompletableFuture<>();
-
     @Transactional
-    Order createOrder(OrderDTO orderDTO) throws ExecutionException, InterruptedException, TimeoutException, DataNotFoundException {
-        validationResults.put(String.valueOf(orderDTO.getUserId()), future);
-        kafkaTemplate.send(validateUserTopic, orderDTO.getUserId());
-
-        Boolean isValid = future.get(5, TimeUnit.SECONDS);
-
-        if (!isValid) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found");
-        }
+    public Order createOrder(OrderDTO orderDTO) throws DataNotFoundException {
         Order order = new Order();
         order.setNote(order.getNote());
-        order.setUserId(orderDTO.getUserId());
+        order.setBuyerId(orderDTO.getBuyerId());
+        order.setSellerId(order.getSellerId());
         order.setOrderDate(LocalDate.now());
-        order.setStatus("PENDING");
+        order.setStatus(OrderStatus.PENDING);
         LocalDate shippingDate = orderDTO.getShippingDate() == null
                 ? LocalDate.now() : orderDTO.getShippingDate();
         if (shippingDate.isBefore(LocalDate.now())) {
@@ -77,20 +59,16 @@ public class OrderService {
     }
 
 
-    public Order getOrder(Long id) throws DataNotFoundException {
+    public Order findOrderById(Long id) throws DataNotFoundException {
         return orderRepository.findById(id).orElseThrow(()-> new DataNotFoundException("order not found"));
     }
 
     @Transactional
-    public Order updateOrder(Long id, OrderDTO orderDTO) throws DataNotFoundException, ExecutionException, InterruptedException, TimeoutException {
+    public Order updateOrder(Long id, OrderDTO orderDTO) throws DataNotFoundException {
         Order order = orderRepository.findById(id).orElseThrow(()-> new DataNotFoundException("Order not found"));
-        validationResults.put(String.valueOf(orderDTO.getUserId()), future);
-        kafkaTemplate.send(validateUserTopic, orderDTO.getUserId());
-
-        Boolean isValid = future.get(5, TimeUnit.SECONDS);
-
         order.setNote(order.getNote());
-        order.setUserId(orderDTO.getUserId());
+        order.setBuyerId(orderDTO.getBuyerId());
+        order.setSellerId(order.getSellerId());
         order.setOrderDate(LocalDate.now());
         order.setStatus(orderDTO.getStatus());
         LocalDate shippingDate = orderDTO.getShippingDate() == null
@@ -113,20 +91,12 @@ public class OrderService {
         }
     }
 
-    public Page<Order> getOrders(String keyword, Long userId, Pageable pageable) throws DataNotFoundException {
-        return orderRepository.searchOrders(userId, keyword, pageable);
+    public Page<Order> searchOrders(String keyword, Long buyerId, Long sellerId, Pageable pageable) {
+        return orderRepository.searchOrders(buyerId,sellerId, keyword, pageable);
     }
 
-    @KafkaListener(topics = "${kafka.topic.validateUserResponse}", groupId = "order-group")
-    public void listenValidationResponse(String message) {
-        System.out.println(message);
-        String[] parts = message.split(":");
-        String userId = parts[0];
-        boolean isValid = Boolean.parseBoolean(parts[1]);
-
-        CompletableFuture<Boolean> future = validationResults.remove(userId);
-        if (future != null) {
-            future.complete(isValid);
-        }
+    public Page<Order> getAllOrders(Pageable pageable){
+        return orderRepository.getAllOrders(pageable);
     }
+
 }

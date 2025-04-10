@@ -16,14 +16,15 @@ import java.util.List;
 @Setter
 public class OrderDTO {
 
-    @JsonProperty("user_id")
-    @Min(value = 1,message = "user id must be > 1")
+    @JsonProperty("buyer_id")
+    @Min(value = 1,message = "buyer id must be > 1")
+    private Long buyerId;
+
+    @JsonProperty("seller_id")
+    @Min(value = 1,message = "seller id must be > 1")
     private Long userId;
 
     private String fullname;
-
-    @JsonProperty("email")
-    private String email;
 
     @JsonProperty("phone_number")
     @NotBlank(message = "phone number cannot be blank")
