@@ -6,6 +6,7 @@ import com.orderservice.exceptions.DataNotFoundException;
 import com.orderservice.model.Order;
 import com.orderservice.model.OrderDetail;
 import com.orderservice.model.OrderStatus;
+import com.orderservice.repository.OrderDetailRepository;
 import com.orderservice.repository.OrderRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -18,19 +19,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-@Service
+
 @RequiredArgsConstructor
+@Service
 public class OrderService {
     private final OrderRepository orderRepository;
+    private final OrderDetailRepository orderDetailRepository;
 
     @Transactional
     public Order createOrder(OrderDTO orderDTO) throws DataNotFoundException {
         Order order = new Order();
-        order.setNote(order.getNote());
+        order.setFullname(orderDTO.getFullname());
+        order.setNote(orderDTO.getNote());
         order.setBuyerId(orderDTO.getBuyerId());
-        order.setSellerId(order.getSellerId());
+        order.setSellerId(orderDTO.getSellerId());
         order.setOrderDate(LocalDate.now());
         order.setStatus(OrderStatus.PENDING);
+        order.setPaymentMethod(orderDTO.getPaymentMethod());
+        order.setShippingMethod(orderDTO.getShippingMethod());
+        order.setShippingAddress(orderDTO.getShippingAddress());
+        order.setTrackingNumber(orderDTO.getTrackingNumber());
+        order.setPhoneNumber(orderDTO.getPhoneNumber());
         LocalDate shippingDate = orderDTO.getShippingDate() == null
                 ? LocalDate.now() : orderDTO.getShippingDate();
         if (shippingDate.isBefore(LocalDate.now())) {
@@ -41,7 +50,6 @@ public class OrderService {
         order.setTotalMoney(orderDTO.getTotalMoney());
         orderRepository.save(order);
 
-        List<OrderDetail> orderDetails = new ArrayList<>();
         for (CartItemDTO cartItemDTO : orderDTO.getCartItems()) {
             OrderDetail orderDetail = new OrderDetail();
             orderDetail.setOrder(order);
@@ -53,7 +61,7 @@ public class OrderService {
             orderDetail.setQuantity(quantity);
             orderDetail.setPrice(price);
             orderDetail.setTotalMoney(quantity * price);
-            orderDetails.add(orderDetail);
+            orderDetailRepository.save(orderDetail);
         }
         return order;
     }
@@ -66,11 +74,17 @@ public class OrderService {
     @Transactional
     public Order updateOrder(Long id, OrderDTO orderDTO) throws DataNotFoundException {
         Order order = orderRepository.findById(id).orElseThrow(()-> new DataNotFoundException("Order not found"));
-        order.setNote(order.getNote());
+        order.setFullname(orderDTO.getFullname());
+        order.setNote(orderDTO.getNote());
         order.setBuyerId(orderDTO.getBuyerId());
-        order.setSellerId(order.getSellerId());
+        order.setSellerId(orderDTO.getSellerId());
         order.setOrderDate(LocalDate.now());
         order.setStatus(orderDTO.getStatus());
+        order.setPaymentMethod(orderDTO.getPaymentMethod());
+        order.setShippingMethod(orderDTO.getShippingMethod());
+        order.setShippingAddress(orderDTO.getShippingAddress());
+        order.setTrackingNumber(orderDTO.getTrackingNumber());
+        order.setPhoneNumber(orderDTO.getPhoneNumber());
         LocalDate shippingDate = orderDTO.getShippingDate() == null
                 ? LocalDate.now() : orderDTO.getShippingDate();
         if (shippingDate.isBefore(LocalDate.now())) {

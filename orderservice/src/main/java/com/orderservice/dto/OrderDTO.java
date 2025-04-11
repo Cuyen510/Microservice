@@ -22,8 +22,9 @@ public class OrderDTO {
 
     @JsonProperty("seller_id")
     @Min(value = 1,message = "seller id must be > 1")
-    private Long userId;
+    private Long sellerId;
 
+    @JsonProperty("fullname")
     private String fullname;
 
     @JsonProperty("phone_number")
@@ -60,8 +61,6 @@ public class OrderDTO {
 
     @JsonProperty("payment_method")
     private String paymentMethod;
-
-    private Boolean active;
 
     @JsonProperty("cart_items")
     List<CartItemDTO> cartItems;
