@@ -35,7 +35,7 @@ public class ProductStockService {
             int quantity = Integer.valueOf(itemParts[1]);
             Product product = productRepository.findById(productId).orElseThrow(() -> new DataNotFoundException("product not found"));
             if (product.getStock() < quantity) {
-                itemlist.add(productId + ":" + "out");
+                itemlist.add(product.getName() + ":" + "out");
             }
         }
 

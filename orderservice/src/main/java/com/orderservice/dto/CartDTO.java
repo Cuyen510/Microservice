@@ -16,4 +16,5 @@ public class CartDTO {
 
     @JsonProperty("cart_items")
     private List<CartItem> cartItems;
+
 }

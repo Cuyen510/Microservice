@@ -102,7 +102,7 @@ public class OrderController {
 
 
     @KafkaListener(topics = "${kafka.topic.productStockResponse}", groupId = "order-group")
-    public void listenValidationResponse(String message) {
+    public void listenConfirmationResponse(String message) {
         System.out.println(message);
         String[] parts = message.split("-");
         String trackingNumber = parts[0];
