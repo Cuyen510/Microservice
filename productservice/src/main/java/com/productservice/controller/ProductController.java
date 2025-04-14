@@ -8,7 +8,7 @@ import com.productservice.model.Product;
 import com.productservice.model.ProductImage;
 import com.productservice.response.ProductListResponse;
 import com.productservice.response.ProductResponse;
-import com.productservice.service.ProductProducerService.ProductProducerService;
+import com.productservice.service.ProductProducerService.ProductStockService;
 import com.productservice.service.ProductService.IProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +38,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ProductController {
     private final IProductService productService;
-    private final ProductProducerService productProducerService;
 
     @PostMapping(value = "")
     public ResponseEntity<?> createProduct(
@@ -228,19 +227,6 @@ public class ProductController {
         productService.deleteProduct(id);
         return ResponseEntity.ok().body("Product deleted");
     }
-
-    @PostMapping("/send")
-    public String sendProduct(@RequestParam("message") String message) {
-        productProducerService.sendMessage(message);
-        return "Message sent successfully";
-    }
-
-    @PostMapping("/sendProduct")
-    public String sendProduct(@RequestParam("id") Long id) throws DataNotFoundException, JsonProcessingException {
-        productProducerService.sendProduct(productService.getProductById(id));
-        return "Product sent successfully";
-    }
-
 
 }
 

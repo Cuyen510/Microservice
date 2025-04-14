@@ -15,4 +15,10 @@ public class CartItemDTO {
     private Integer quantity;
 
     private Float price;
+
+    @Override
+    public String toString() {
+        return productId +":"+ quantity;
+    }
+
 }

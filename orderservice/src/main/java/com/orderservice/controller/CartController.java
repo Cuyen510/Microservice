@@ -15,22 +15,22 @@ public class CartController {
     private final CartService cartService;
 
     @GetMapping("/id")
-    public ResponseEntity<?> getCart(@PathVariable("id") Long userId){
+    public ResponseEntity<?> getCart(@PathVariable("user_id") Long userId){
         return ResponseEntity.ok().body(cartService.findCartByUserId(userId));
     }
 
     @PostMapping("/id")
-    public ResponseEntity<?> createCart(@PathVariable("id") Long userId){
+    public ResponseEntity<?> createCart(@PathVariable("user_id") Long userId){
         return ResponseEntity.ok().body(cartService.createCart(userId));
     }
 
     @PutMapping("/id")
-    public ResponseEntity<?> updateCart(@PathVariable("id") Long userId, CartDTO cartDTO) throws DataNotFoundException {
+    public ResponseEntity<?> updateCart(@PathVariable("user_id") Long userId, CartDTO cartDTO) throws DataNotFoundException {
         return ResponseEntity.ok().body(cartService.updateCart(userId, cartDTO));
     }
 
     @DeleteMapping
-    public ResponseEntity<?> deleteCartItems(@PathVariable("id") Long userId) throws DataNotFoundException {
+    public ResponseEntity<?> deleteCartItems(@PathVariable("user_id") Long userId) throws DataNotFoundException {
         cartService.deleteCartItems(userId);
         return ResponseEntity.ok().body("Cart items deleted");
     }

@@ -1,0 +1,43 @@
+spring:
+  application:
+    name: orderservice
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/orderservice
+    username: root
+    password:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format-sql: true
+
+server:
+  port: 9003
+
+kafka:
+  topic:
+    productStockRequest: product-stock-request
+    productStockResponse: product-stock-response
+  bootstrap-servers: localhost:9092
+  consumer:
+    group-id: gateway-group
+    auto-offset-reset: earliest
+    key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    properties:
+      spring.json.trusted.packages: "*"
+  producer:
+    key-serializer: org.apache.kafka.common.serialization.StringSerializer
+    value-serializer: org.apache.kafka.common.serialization.StringDeserializer
+
+
+# eureka:
+#   client:
+#     service-url:
+#       defaultZone: http://localhost:8761/eureka

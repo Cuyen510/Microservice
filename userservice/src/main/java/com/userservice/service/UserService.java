@@ -2,7 +2,6 @@ package com.userservice.service;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.userservice.model.Role;
 import com.userservice.model.User;
 import com.userservice.repository.RoleRepository;
 import com.userservice.repository.UserRepository;
@@ -10,15 +9,12 @@ import com.userservice.exceptions.DataNotFoundException;
 import com.userservice.dto.UserDTO;
 import com.userservice.response.UserLoginResponse;
 import lombok.RequiredArgsConstructor;
-import org.bouncycastle.math.ec.rfc8032.Ed448;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.ResponseCookie;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.Duration;
 import java.util.Date;
 import java.util.List;
 

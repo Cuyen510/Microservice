@@ -8,7 +8,7 @@
   kafka:
     topic:
       validateUser: validate-user-request
-      validateUserResponse:
+      validateUserResponse: validate-user-response
     bootstrap-servers: localhost:9092
     consumer:
       group-id: gateway-group
@@ -43,6 +43,13 @@
             uri: http://localhost:9002
             predicates:
               - Path=/api/v1/users/{id}, /api/v1/users
+            filters:
+              - AuthFilter
+
+          - id: order-protected-routes
+            uri: http://localhost:9003
+            predicates:
+              - Path=/api/v1/orders/**, /api/v1/cart/**
             filters:
               - AuthFilter
 
