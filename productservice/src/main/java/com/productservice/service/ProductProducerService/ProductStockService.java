@@ -4,17 +4,17 @@ package com.productservice.service.ProductProducerService;
 import com.productservice.exceptions.DataNotFoundException;
 import com.productservice.model.Product;
 import com.productservice.repository.ProductRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
-@Slf4j
 @RequiredArgsConstructor
 public class ProductStockService {
     @Value("${kafka.topic.productStockResponse}")
@@ -28,20 +28,44 @@ public class ProductStockService {
     public void checkProductStock(String request) throws DataNotFoundException {
         String[] parts = request.split("-");
         String requestId = parts[0];
-        List<String> itemlist = List.of(parts[1].split(":"));
-        for (String item : itemlist) {
+        int start = parts[1].indexOf('[') + 1;
+        int end = parts[1].indexOf(']');
+        parts[1] = parts[1].substring(start, end);
+        List<String> itemList = new ArrayList<>();
+        for (String item : List.of(parts[1].split(", "))) {
             String[] itemParts = item.split(":");
             Long productId = Long.valueOf(itemParts[0]);
             int quantity = Integer.valueOf(itemParts[1]);
             Product product = productRepository.findById(productId).orElseThrow(() -> new DataNotFoundException("product not found"));
             if (product.getStock() < quantity) {
-                itemlist.add(product.getName() + ":" + "out");
+                itemList.add(product.getName());
             }
         }
 
-        String result = requestId+"-"+String.join(", ", itemlist);
+        String result = requestId+"-"+String.join(", ", itemList);
 
-        kafkaTemplate.send("${kafka.topic.productStockResponse}", result);
+        kafkaTemplate.send(productStockResponse, result);
+    }
+    @Transactional
+    @KafkaListener(topics = "${kafka.topic.productStockUpdate}", groupId = "product-group")
+    public void updateProductStock(String request) throws DataNotFoundException {
+        String[] parts = request.split("-");
+        String requestId = parts[0];
+        int start = parts[1].indexOf('[') + 1;
+        int end = parts[1].indexOf(']');
+        parts[1] = parts[1].substring(start, end);
+        for (String item : List.of(parts[1].split(", "))) {
+            String[] itemParts = item.split(":");
+            Long productId = Long.valueOf(itemParts[0]);
+            int quantity = Integer.valueOf(itemParts[1]);
+            Product product = productRepository.findById(productId).orElseThrow(() -> new DataNotFoundException("product not found"));
+            product.setStock(product.getStock()+quantity);
+            productRepository.save(product);
+        }
+
+        String result = requestId+"-"+"updated";
+
+        kafkaTemplate.send(productStockResponse, result);
     }
 
 }

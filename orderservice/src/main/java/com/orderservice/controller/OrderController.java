@@ -2,6 +2,7 @@ package com.orderservice.controller;
 
 import com.orderservice.dto.OrderDTO;
 import com.orderservice.exceptions.DataNotFoundException;
+import com.orderservice.service.KafkaBridgeService;
 import com.orderservice.service.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -9,7 +10,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
-import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -18,8 +18,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 @Controller
 @RequiredArgsConstructor
@@ -28,7 +29,8 @@ public class OrderController {
     private final OrderService orderService;
 
     private final KafkaTemplate<String, String> kafkaTemplate;
-    private final ConcurrentHashMap<String, CompletableFuture<String>> confirmationResults = new ConcurrentHashMap<>();
+
+    private final KafkaBridgeService kafkaBridgeService;
     @Value("${kafka.topic.productStockRequest}")
     private String productStockRequest;
 
@@ -42,20 +44,15 @@ public class OrderController {
         };
 
         CompletableFuture<String> future = new CompletableFuture<>();
-        confirmationResults.put(orderDTO.getTrackingNumber(), future);
-        kafkaTemplate.send(productStockRequest, orderDTO.getTrackingNumber()+"-"+orderDTO.getCartItems().toString());
+        kafkaBridgeService.put(orderDTO.getPhoneNumber(), future);
+        kafkaTemplate.send(productStockRequest, orderDTO.getPhoneNumber()+"-"+orderDTO.getCartItems().toString());
 
         String response = future.get(5, TimeUnit.SECONDS);
 
-        if (response != null) {
-            String[] parts = response.split(", ");
-            StringBuilder sb = new StringBuilder();
-            for (String part : parts) {
-                String[] itemParts = part.split(":");
-                sb.append(itemParts[0]).append(", ");
-            }
-            throw new Exception(sb+ "out of stock");
+        if (response != null && !response.isBlank()) {
+            return ResponseEntity.badRequest().body("Not enough stock: " + response);
         }
+
         return ResponseEntity.ok().body(orderService.createOrder(orderDTO));
     }
 
@@ -84,31 +81,20 @@ public class OrderController {
         return ResponseEntity.ok().body(orderService.searchOrders(keyword,buyerId,sellerId,pageRequest));
     }
 
-    @GetMapping("/search/id")
+    @GetMapping("/search/{id}")
     public ResponseEntity<?> searchOrderById(@PathVariable("id") Long id) throws DataNotFoundException {
         return ResponseEntity.ok().body(orderService.findOrderById(id));
     }
 
-    @PutMapping("/id")
+    @PutMapping("/{id}")
     public ResponseEntity<?> updateOrder(@PathVariable("id") Long id, @RequestBody OrderDTO orderDTO) throws DataNotFoundException {
         return ResponseEntity.ok().body(orderService.updateOrder(id, orderDTO));
     }
 
-    @DeleteMapping("/id")
-    public ResponseEntity<?> deleteOrder(@PathVariable("id") Long id){
-        orderService.deleteOrder(id);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> cancelOrder(@PathVariable("id") Long id) throws DataNotFoundException, ExecutionException, InterruptedException, TimeoutException {
+        orderService.cancelOrder(id);
         return ResponseEntity.ok().body("order deleted");
     }
 
-
-    @KafkaListener(topics = "${kafka.topic.productStockResponse}", groupId = "order-group")
-    public void listenConfirmationResponse(String message) {
-        System.out.println(message);
-        String[] parts = message.split("-");
-        String trackingNumber = parts[0];
-        CompletableFuture<String> future = confirmationResults.remove(trackingNumber);
-        if (future != null) {
-            future.complete(parts[1]);
-        }
-    }
 }

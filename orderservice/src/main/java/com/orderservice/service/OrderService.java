@@ -10,14 +10,19 @@ import com.orderservice.repository.OrderDetailRepository;
 import com.orderservice.repository.OrderRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 
 @RequiredArgsConstructor
@@ -25,6 +30,11 @@ import java.util.List;
 public class OrderService {
     private final OrderRepository orderRepository;
     private final OrderDetailRepository orderDetailRepository;
+    private final KafkaBridgeService kafkaBridgeService;
+    private final KafkaTemplate<String, String> kafkaTemplate;
+
+    @Value("${kafka.topic.productStockUpdate}")
+    private String productStockUpdate;
 
     @Transactional
     public Order createOrder(OrderDTO orderDTO) throws DataNotFoundException {
@@ -38,7 +48,7 @@ public class OrderService {
         order.setPaymentMethod(orderDTO.getPaymentMethod());
         order.setShippingMethod(orderDTO.getShippingMethod());
         order.setShippingAddress(orderDTO.getShippingAddress());
-        order.setTrackingNumber(orderDTO.getTrackingNumber());
+        order.setTrackingNumber(UUID.randomUUID().toString());
         order.setPhoneNumber(orderDTO.getPhoneNumber());
         LocalDate shippingDate = orderDTO.getShippingDate() == null
                 ? LocalDate.now() : orderDTO.getShippingDate();
@@ -97,11 +107,19 @@ public class OrderService {
     }
 
     @Transactional
-    public void deleteOrder(Long id) {
-        Order order = orderRepository.findById(id).orElse(null);
-        if(order !=null){
+    public void cancelOrder(Long id) throws DataNotFoundException, ExecutionException, InterruptedException, TimeoutException {
+        Order order = orderRepository.findById(id).orElseThrow(()-> new DataNotFoundException("Can't find order with id: "+id));
+        CompletableFuture<String> future = new CompletableFuture<>();
+        kafkaBridgeService.put(String.valueOf(id), future);
+        kafkaTemplate.send(productStockUpdate, id+"-"+order.getOrderDetails().toString());
+
+        String response = future.get(5, TimeUnit.SECONDS);
+
+        if (response.equals("updated")) {
             order.setActive(false);
             orderRepository.save(order);
+        }else{
+            throw new RuntimeException("Invalid response");
         }
     }
 
