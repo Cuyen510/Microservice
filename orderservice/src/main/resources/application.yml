@@ -26,6 +26,7 @@ kafka:
     productStockResponse: product-stock-response
     productStockUpdate: product-stock-update
     productStockUpdateResponse: product-stock-update-response
+    createCart: create-cart
   bootstrap-servers: localhost:9092
   consumer:
     group-id: order-group

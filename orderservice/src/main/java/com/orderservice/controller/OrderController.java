@@ -49,7 +49,7 @@ public class OrderController {
 
         String response = future.get(5, TimeUnit.SECONDS);
 
-        if (response != null && !response.isBlank()) {
+        if (!response.equals("ok")) {
             return ResponseEntity.badRequest().body("Not enough stock: " + response);
         }
 
@@ -94,7 +94,7 @@ public class OrderController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> cancelOrder(@PathVariable("id") Long id) throws DataNotFoundException, ExecutionException, InterruptedException, TimeoutException {
         orderService.cancelOrder(id);
-        return ResponseEntity.ok().body("order deleted");
+        return ResponseEntity.ok().body("order canceled");
     }
 
 }

@@ -20,6 +20,9 @@ public class ProductStockService {
     @Value("${kafka.topic.productStockResponse}")
     private String productStockResponse;
 
+    @Value("${kafka.topic.productStockUpdateResponse}")
+    private String productStockUpdateResponse;
+
     private final KafkaTemplate<String, String> kafkaTemplate;
 
     private final ProductRepository productRepository;
@@ -39,11 +42,16 @@ public class ProductStockService {
             Product product = productRepository.findById(productId).orElseThrow(() -> new DataNotFoundException("product not found"));
             if (product.getStock() < quantity) {
                 itemList.add(product.getName());
+            }else{
+                product.setStock(product.getStock()-quantity);
             }
         }
-
-        String result = requestId+"-"+String.join(", ", itemList);
-
+        String result = new String();
+        if(itemList.isEmpty()){
+            result =  requestId+"-ok";
+        }else {
+            result = requestId + "-" + String.join(", ", itemList);
+        }
         kafkaTemplate.send(productStockResponse, result);
     }
     @Transactional
@@ -65,7 +73,7 @@ public class ProductStockService {
 
         String result = requestId+"-"+"updated";
 
-        kafkaTemplate.send(productStockResponse, result);
+        kafkaTemplate.send(productStockUpdateResponse, result);
     }
 
 }

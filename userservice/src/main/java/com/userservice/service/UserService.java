@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +26,10 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
+    private final KafkaTemplate<String, String> kafkaTemplate;
+
+    @Value("${kafka.topic.createCart}")
+    private String createCart;
 
     @Value("${security.jwt.secret}")
     private String jwtSecret;
@@ -39,6 +44,7 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         user.setActive(true);
         user.setRole(roleRepository.findByName("user"));
+        kafkaTemplate.send(createCart, String.valueOf(user.getId()));
         return userRepository.save(user);
     }
 

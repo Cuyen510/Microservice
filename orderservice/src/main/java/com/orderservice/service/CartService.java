@@ -24,8 +24,8 @@ public class CartService {
         return cartRepository.findByUserId(userId).get();
     }
 
-    public Cart updateCart(Long userId, CartDTO cartDTO) throws DataNotFoundException {
-        Cart cart = cartRepository.findByUserId(userId).orElseThrow(() -> new DataNotFoundException("Cart not found"));
+    public Cart updateCart(CartDTO cartDTO) throws DataNotFoundException {
+        Cart cart = cartRepository.findByUserId(cartDTO.getUserId()).orElseThrow(() -> new DataNotFoundException("Cart not found"));
         cart.setCartItems(cartDTO.getCartItems());
         return cartRepository.save(cart);
     }

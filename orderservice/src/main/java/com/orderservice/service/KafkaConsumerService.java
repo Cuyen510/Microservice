@@ -12,7 +12,9 @@ public class KafkaConsumerService {
 
     private final KafkaBridgeService kafkaBridgeService;
 
-    @KafkaListener(topics = "${kafka.topic.productStockResponse}", groupId = "order-group",containerFactory = "kafkaListenerFactory")
+    private final CartService cartService;
+
+    @KafkaListener(topics = "${kafka.topic.productStockResponse}", groupId = "order-group")
     public void listenConfirmationResponse(String message) {
         System.out.println("Received: " + message);
         String[] parts = message.split("-");
@@ -23,7 +25,7 @@ public class KafkaConsumerService {
         }
     }
 
-    @KafkaListener(topics = "${kafka.topic.productStockUpdateResponse}", groupId = "order-group",containerFactory = "kafkaListenerFactory")
+    @KafkaListener(topics = "${kafka.topic.productStockUpdateResponse}", groupId = "order-group")
     public void listenConfirmationUpdateResponse(String message) {
         System.out.println("Received: " + message);
         String[] parts = message.split("-");
@@ -32,5 +34,12 @@ public class KafkaConsumerService {
         if (future != null) {
             future.complete(parts[1]);
         }
+    }
+
+    @KafkaListener(topics = "${kafka.topic.createCart}", groupId = "order-group")
+    public void listenCreateCartMessage(String message) {
+        System.out.println("Received: " + message);
+        Long userId = Long.valueOf(message);
+        cartService.createCart(userId);
     }
 }

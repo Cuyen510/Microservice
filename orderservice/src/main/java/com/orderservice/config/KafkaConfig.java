@@ -38,6 +38,8 @@ public class KafkaConfig {
         return factory;
     }
 
+
+
     @Bean
     public ProducerFactory<String, String> producerFactory() {
         Map<String, Object> config = new HashMap<>();
