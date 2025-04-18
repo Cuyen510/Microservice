@@ -12,8 +12,8 @@ import lombok.*;
 @Table(name = "cart_items")
 public class CartItem {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "product_id")
+    private Long productId;
 
     private Float price;
 

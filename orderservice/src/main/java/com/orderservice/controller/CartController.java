@@ -35,14 +35,14 @@ public class CartController {
         return ResponseEntity.ok().body(cartService.createCart(userId));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updateCart(CartDTO cartDTO) throws DataNotFoundException, ExecutionException, InterruptedException, TimeoutException {
+    @PutMapping("")
+    public ResponseEntity<?> updateCart(@RequestBody CartDTO cartDTO) throws DataNotFoundException, ExecutionException, InterruptedException, TimeoutException {
         CompletableFuture<String> future = new CompletableFuture<>();
         kafkaBridgeService.put(String.valueOf(cartDTO.getUserId()), future);
         kafkaTemplate.send(productStockRequest, cartDTO.getUserId()+"-"+cartDTO.getCartItems().toString());
 
         String response = future.get(5, TimeUnit.SECONDS);
-        if (response != null && !response.isBlank()) {
+        if (!response.equals("ok")) {
             return ResponseEntity.badRequest().body("Not enough stock: " + response);
         }
         return ResponseEntity.ok().body(cartService.updateCart(cartDTO));

@@ -46,7 +46,7 @@ public class ProductStockService {
                 product.setStock(product.getStock()-quantity);
             }
         }
-        String result = new String();
+        String result;
         if(itemList.isEmpty()){
             result =  requestId+"-ok";
         }else {

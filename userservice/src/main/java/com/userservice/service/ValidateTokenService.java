@@ -17,7 +17,7 @@ public class ValidateTokenService {
     @Value("${kafka.topic.validateUserResponse}")
     private String validateUserResponse;
 
-    @KafkaListener(topics = "${validate-user-request}", groupId = "user-service-group")
+    @KafkaListener(topics = "${kafka.topic.validateUserRequest}", groupId = "user-service-group")
     public void validateToken(String username) {
         boolean exists = userRepository.existsByPhoneNumber(username);
         kafkaTemplate.send(validateUserResponse, username + ":" + exists);

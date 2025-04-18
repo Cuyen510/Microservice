@@ -1,8 +1,10 @@
 package com.orderservice.service;
 
 import com.orderservice.dto.CartDTO;
+import com.orderservice.dto.CartItemDTO;
 import com.orderservice.exceptions.DataNotFoundException;
 import com.orderservice.model.Cart;
+import com.orderservice.model.CartItem;
 import com.orderservice.repository.CartRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,7 +28,15 @@ public class CartService {
 
     public Cart updateCart(CartDTO cartDTO) throws DataNotFoundException {
         Cart cart = cartRepository.findByUserId(cartDTO.getUserId()).orElseThrow(() -> new DataNotFoundException("Cart not found"));
-        cart.setCartItems(cartDTO.getCartItems());
+        for (CartItemDTO cartItemDTO : cartDTO.getCartItems()) {
+            CartItem cartItem = new CartItem().builder()
+                    .cart(cart)
+                    .quantity(cartItemDTO.getQuantity())
+                    .price(cartItemDTO.getPrice())
+                    .productId(cartItemDTO.getProductId())
+                    .build();
+            cart.getCartItems().add(cartItem);
+        }
         return cartRepository.save(cart);
     }
 

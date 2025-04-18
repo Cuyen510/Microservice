@@ -44,8 +44,10 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         user.setActive(true);
         user.setRole(roleRepository.findByName("user"));
+
+        userRepository.save(user);
         kafkaTemplate.send(createCart, String.valueOf(user.getId()));
-        return userRepository.save(user);
+        return user;
     }
 
     public List<User> getAllUsers(){

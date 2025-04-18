@@ -15,6 +15,6 @@ public class CartDTO {
     private Long userId;
 
     @JsonProperty("cart_items")
-    private List<CartItem> cartItems;
+    private List<CartItemDTO> cartItems;
 
 }
