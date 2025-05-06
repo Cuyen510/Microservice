@@ -1,14 +1,11 @@
 package com.productservice.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.productservice.dto.ProductDTO;
 import com.productservice.dto.ProductImageDTO;
-import com.productservice.exceptions.DataNotFoundException;
 import com.productservice.model.Product;
 import com.productservice.model.ProductImage;
 import com.productservice.response.ProductListResponse;
 import com.productservice.response.ProductResponse;
-import com.productservice.service.ProductProducerService.ProductStockService;
 import com.productservice.service.ProductService.IProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -28,10 +25,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/v1/products")
@@ -209,6 +204,15 @@ public class ProductController {
         }
     }
 
+    @GetMapping("/by-ids")
+    public ResponseEntity<?> getProductByIds(@RequestParam("ids") String ids){
+        List<Long> productIds = Arrays.stream(ids.split(","))
+                .map(Long::parseLong).collect(Collectors.toList());
+
+        List<Product> products = productService.findProductByIds(productIds);
+        return ResponseEntity.ok(products);
+    }
+
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateProduct(
@@ -227,6 +231,8 @@ public class ProductController {
         productService.deleteProduct(id);
         return ResponseEntity.ok().body("Product deleted");
     }
+
+
 
 }
 

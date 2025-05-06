@@ -5,21 +5,53 @@ import com.orderservice.dto.CartItemDTO;
 import com.orderservice.exceptions.DataNotFoundException;
 import com.orderservice.model.Cart;
 import com.orderservice.model.CartItem;
+import com.orderservice.repository.CartItemRepository;
 import com.orderservice.repository.CartRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.util.List;
+
 
 @Service
 @RequiredArgsConstructor
 public class CartService {
     private final CartRepository cartRepository;
-
+    private final CartItemRepository cartItemRepository;
     public Cart createCart(Long userId){
         Cart cart = new Cart();
         cart.setUserId(userId);
         return cartRepository.save(cart);
+    }
+
+    public CartItem addToCart(Long userId, CartItemDTO cartItemDTO) throws DataNotFoundException {
+        Cart cart =  cartRepository.findByUserId(userId).orElseThrow(()-> new DataNotFoundException("Cant find cart"));
+        List<Long> productIds = cart.getCartItems()
+                .stream()
+                .map(CartItem::getProductId)
+                .toList();
+        CartItem cartItem;
+        if(productIds.contains(cartItemDTO.getProductId())){
+            cartItem = cartItemRepository.findByProductIdAndCartId(cartItemDTO.getProductId(), cart.getId()).orElseThrow(() -> new DataNotFoundException("Cant find cart"));
+            cartItem.setQuantity(cartItem.getQuantity()+cartItemDTO.getQuantity());
+        }else{
+            cartItem = new CartItem();
+            cartItem.setCart(cart);
+            cartItem.setPrice(cartItemDTO.getPrice());
+            cartItem.setProductId(cartItemDTO.getProductId());
+            cartItem.setQuantity(cartItemDTO.getQuantity());
+        }
+        return cartItemRepository.save(cartItem);
+    }
+
+    public CartItem updateCartItem(Long userId, CartItemDTO cartItemDTO) throws DataNotFoundException {
+        Cart cart = cartRepository.findByUserId(userId).orElseThrow(()-> new DataNotFoundException("cant find user"));
+        CartItem cartItem = cartItemRepository.findByProductIdAndCartId(cartItemDTO.getProductId(), cart.getId()).orElseThrow(()-> new DataNotFoundException("cant find user"));
+        if(cartItemDTO.getQuantity() == 0) cartItemRepository.delete(cartItem);
+        else{
+            cartItem.setQuantity(cartItemDTO.getQuantity());
+        }
+        return cartItemRepository.save(cartItem);
     }
 
     public Cart findCartByUserId(Long userId){

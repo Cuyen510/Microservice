@@ -114,4 +114,10 @@ public class ProductService implements IProductService {
         return productRepository.findByUserId(userId);
     }
 
+    @Override
+    public List<Product> findProductByIds(List<Long> productIds){
+        List<Product> products = productRepository.findProductByIds(productIds);
+        return products;
+    }
+
 }

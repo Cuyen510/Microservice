@@ -20,15 +20,18 @@ import { TokenService } from '../../service/token.service';
 export class HeaderComponent  {
   isLoggedIn: boolean = false; 
   username: string = '';
-
+  user_id: number = 0;
   constructor(private tokenService: TokenService) { 
     this.checkLoginStatus();
   }
 
+   
+
   checkLoginStatus() {
     this.isLoggedIn = !this.tokenService.isTokenExpired(); 
     if (this.isLoggedIn) {
-      this.username = this.tokenService.getUser().phoneNumber; 
+      this.username = this.tokenService.getUser().fullname; 
+      this.user_id = this.tokenService.getUserId();
     }
   }
 

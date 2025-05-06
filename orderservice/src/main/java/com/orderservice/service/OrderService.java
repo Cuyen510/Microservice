@@ -40,8 +40,7 @@ public class OrderService {
         Order order = new Order();
         order.setFullname(orderDTO.getFullname());
         order.setNote(orderDTO.getNote());
-        order.setBuyerId(orderDTO.getBuyerId());
-        order.setSellerId(orderDTO.getSellerId());
+        order.setUserId(orderDTO.getUserId());
         order.setOrderDate(LocalDate.now());
         order.setStatus(OrderStatus.PENDING);
         order.setPaymentMethod(orderDTO.getPaymentMethod());
@@ -85,8 +84,7 @@ public class OrderService {
         Order order = orderRepository.findById(id).orElseThrow(()-> new DataNotFoundException("Order not found"));
         order.setFullname(orderDTO.getFullname());
         order.setNote(orderDTO.getNote());
-        order.setBuyerId(orderDTO.getBuyerId());
-        order.setSellerId(orderDTO.getSellerId());
+        order.setUserId(orderDTO.getUserId());
         order.setOrderDate(LocalDate.now());
         order.setStatus(orderDTO.getStatus());
         order.setPaymentMethod(orderDTO.getPaymentMethod());
@@ -122,8 +120,8 @@ public class OrderService {
         }
     }
 
-    public Page<Order> searchOrders(String keyword, Long buyerId, Long sellerId, Pageable pageable) {
-        return orderRepository.searchOrders(buyerId,sellerId, keyword, pageable);
+    public Page<Order> searchOrders(String keyword, Long userId, Pageable pageable) {
+        return orderRepository.searchOrders(userId, keyword, pageable);
     }
 
     public Page<Order> getAllOrders(Pageable pageable){

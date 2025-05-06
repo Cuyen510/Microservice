@@ -13,9 +13,9 @@ export interface Product {
 
     stock: number;
 
-    category_id : number ;
+    categoryId : number ;
 
-    user_id: number;
+    userId: number;
 
     url : string;
 

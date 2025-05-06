@@ -1,7 +1,6 @@
 package com.orderservice.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.orderservice.model.CartItem;
 import lombok.*;
 
 import java.util.List;

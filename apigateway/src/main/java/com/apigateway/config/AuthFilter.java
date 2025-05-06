@@ -66,7 +66,7 @@ public class AuthFilter extends AbstractGatewayFilterFactory<AuthFilter.Config> 
                 validationResults.put(username, future);
                 kafkaTemplate.send(validateUserTopic, username);
 
-                Boolean isValid = future.get(5, TimeUnit.SECONDS);
+                Boolean isValid = future.get(10, TimeUnit.SECONDS);
 
                 if (!isValid) {
                     throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found");

@@ -1,5 +1,6 @@
 package com.orderservice.response;
 
+import com.orderservice.model.CartItem;
 import lombok.*;
 
 @Getter
@@ -7,7 +8,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ApiResponse {
-    String message;
-
+public class AddToCartResponse {
+    private String message;
+    private CartItem cartItem;
 }

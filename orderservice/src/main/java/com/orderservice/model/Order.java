@@ -19,11 +19,8 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "seller_id")
-    private Long sellerId;
-
-    @Column(name = "buyer_id")
-    private Long buyerId;
+    @Column(name = "user_id")
+    private Long userId;
 
     @Column(name = "fullname", nullable = false, length = 100)
     private String fullname;

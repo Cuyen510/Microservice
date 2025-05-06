@@ -1,5 +1,6 @@
 package com.orderservice.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,6 +13,9 @@ import lombok.*;
 @Table(name = "cart_items")
 public class CartItem {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     @Column(name = "product_id")
     private Long productId;
 
@@ -22,6 +26,7 @@ public class CartItem {
 
     @ManyToOne
     @JoinColumn(name = "cart")
+    @JsonIgnore
     private Cart cart;
 
 

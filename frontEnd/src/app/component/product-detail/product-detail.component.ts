@@ -8,10 +8,18 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HeaderComponent } from '../header/header.component';
 import { FooterComponent } from '../footer/footer.component';
+import { CartService } from '../../service/cart.service';
+import { TokenService } from '../../service/token.service';
+import { UpdateCartDTO } from '../../dto/cart/cart.dto';
+import { CartItem } from '../../model/cartItem';
+import { CartItemDTO } from '../../dto/cart/cartItem.dto';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { AddToCartReponse } from '../../response/cart/addToCart.response';
+
 
 @Component({
   selector: 'app-product-detail',
-  imports: [CommonModule, FormsModule, HeaderComponent, FooterComponent],
+  imports: [CommonModule, FormsModule, HeaderComponent, FooterComponent, MatSnackBarModule],
   templateUrl: './product-detail.component.html',
   styleUrl: './product-detail.component.scss'
 })
@@ -21,10 +29,12 @@ export class ProductDetailComponent implements OnInit {
   productId: number = 0;
   currentImageIndex: number = 0;
   quantity: number = 1;
-  isPressedAddToCart:boolean = false;
   images: string[] = [];
   constructor(private productService: ProductService,
-              private activatedRoute: ActivatedRoute
+              private activatedRoute: ActivatedRoute,
+              private cartService: CartService,
+              private tokenService: TokenService,
+              private snackBar: MatSnackBar
   ){
 
   }
@@ -108,4 +118,18 @@ export class ProductDetailComponent implements OnInit {
     }
     return 0;
   }
+
+  addToCart(): void {
+    const cartItem: CartItemDTO = {
+      product_id: this.productId,
+      quantity: this.quantity
+    }
+  
+    this.cartService.addToCart(this.tokenService.getToken(),this.tokenService.getUserId(),cartItem).subscribe({
+      next: (response: AddToCartReponse) => {
+        this.snackBar.open(response.message, 'Close', { duration: 3000 });
+      }
+    });
+  }
+  
 }

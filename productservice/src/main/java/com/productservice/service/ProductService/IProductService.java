@@ -29,4 +29,6 @@ public interface IProductService {
 
     List<Product> getProductByUserId(Long userId);
 
+    List<Product> findProductByIds(List<Long> productIds);
+
 }

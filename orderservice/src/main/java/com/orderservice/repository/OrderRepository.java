@@ -11,21 +11,18 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
-    List<Order> findByBuyerId(Long userId);
-
-    List<Order> findBySellerId(Long userId);
+    List<Order> findByUserId(Long userId);
 
 
     @Query("SELECT o FROM Order o " +
-        "WHERE (o.sellerId = :sellerId OR o.buyerId = :buyerId OR :sellerId IS NULL OR :buyerId IS NULL) " +
+        "WHERE (o.userId = :userId OR :userId IS NULL) " +
         "AND (:keyword IS NULL OR :keyword = '' " +
         "OR o.fullname LIKE CONCAT('%', :keyword, '%') " +
         "OR o.address LIKE CONCAT('%', :keyword, '%') " +
         "OR o.note LIKE CONCAT('%', :keyword, '%') " +
         "OR o.phoneNumber LIKE CONCAT('%', :keyword, '%'))")
     Page<Order> searchOrders
-            (@Param("buyerId") Long buyerId,
-             @Param("sellerId") Long sellerId,
+            (@Param("userId") Long userId,
              @Param("keyword") String keyword,
              Pageable pageable);
 

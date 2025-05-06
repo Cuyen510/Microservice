@@ -72,13 +72,12 @@ public class OrderController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int limit,
             @RequestParam(defaultValue = "") String keyword,
-            @RequestParam(defaultValue = "") Long buyerId,
-            @RequestParam(defaultValue = "") Long sellerId) {
+            @RequestParam(defaultValue = "") Long userId) {
         PageRequest pageRequest = PageRequest.of(
                 page, limit,
                 Sort.by("orderDate").descending()
         );
-        return ResponseEntity.ok().body(orderService.searchOrders(keyword,buyerId,sellerId,pageRequest));
+        return ResponseEntity.ok().body(orderService.searchOrders(keyword,userId,pageRequest));
     }
 
     @GetMapping("/search/{id}")
