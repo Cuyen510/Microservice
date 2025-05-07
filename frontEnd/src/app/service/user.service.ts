@@ -20,14 +20,8 @@ export class UserService {
   private apiConfig = {
     headers: this.createHeaders()
   }
-
-
-
-
   constructor(private http: HttpClient) 
-  { 
-    
-  }
+  {}
 
   private createHeaders() :HttpHeaders{
     return new HttpHeaders({'Content-Type': 'application/json'});
@@ -40,20 +34,29 @@ export class UserService {
     return this.http.post(this.apiLogin, loginDTO,this.apiConfig);
   }
 
-  getUserDetail(token: string): Observable<ApiResponse> {
-    return this.http.post<ApiResponse>(this.apiUserDetail, {
+  getUserDetail(token: string): Observable<any> {
+    return this.http.get<any>(this.apiUserDetail, {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
-        Authorization: `Bearer `+ token
+        Authorization: `Bearer ${token}`
+      })
+    })
+  }
+
+  getUserAddress(token: string, userId: number): Observable<any>{
+    return this.http.get<any>(`${this.apiUserDetail}/${userId}`, {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
       })
     })
   }
 
 
-  updateUserDetail(token: string, updateUserDTO: UpdateUserDTO): Observable<ApiResponse>  {
+  updateUserDetail(token: string, updateUserDTO: UpdateUserDTO): Observable<any>  {
     debugger
     let userResponse = JSON.parse(window.localStorage.getItem('ecom-user')!);        
-    return this.http.put<ApiResponse>(`${this.apiUserDetail}/${userResponse?.id}`,updateUserDTO,{
+    return this.http.put<any>(`${this.apiUserDetail}/${userResponse?.id}`,updateUserDTO,{
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`

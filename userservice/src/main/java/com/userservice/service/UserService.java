@@ -54,6 +54,10 @@ public class UserService {
         return userRepository.findAll();
     }
 
+    public String getUserAddress(Long id) throws DataNotFoundException {
+        User user = userRepository.findById(id).orElseThrow(() -> new DataNotFoundException("Cant find user"));
+        return user.getAddress();
+    }
     public User getUserDetails(Long id) throws DataNotFoundException {
         return userRepository.findById(id).orElseThrow(() -> new DataNotFoundException("Can't find user with id:" + id));
     }

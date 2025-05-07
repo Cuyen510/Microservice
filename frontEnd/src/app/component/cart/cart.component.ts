@@ -14,6 +14,8 @@ import { OrderDTO } from '../../dto/order/order.dto';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CartItem } from '../../model/cartItem';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { OrderService } from '../../service/order.service';
+import { UserService } from '../../service/user.service';
 
 @Component({
   selector: 'app-cart',
@@ -37,17 +39,18 @@ export class CartComponent {
     private cartService: CartService,
     private productService: ProductService,
     private tokenService: TokenService,
-    private router: Router,
     private formBuilder: FormBuilder,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private orderService: OrderService,
+    private userService: UserService
   ) {
     this.orderForm = this.formBuilder.group({
       fullname: [this.tokenService.getUser().fullname, Validators.required],    
       phone_number: [this.tokenService.getUser().phone_number, [Validators.required, Validators.minLength(6)]], 
       address: ["", [Validators.required, Validators.minLength(5)]], 
       note: [''],
-      shipping_method: ['express'],
-      payment_method: ['cod'],
+      shipping_method: [''],
+      payment_method: [''],
       shipping_address: [this.tokenService.getUser().address]
     });
   }
@@ -149,7 +152,38 @@ export class CartComponent {
   
 
   confirmOrder(): void{
+    Object.entries(this.groupedCartItems).forEach(([sellerId, items]) => {
+      let total = 0;
+      const cart_item: CartItemDTO[] = [];
+      let sellerAddress = '';
+      this.userService.getUserAddress(this.tokenService.getToken(), parseInt(sellerId, 10)).subscribe({
+        next: (response: any) =>{
+          sellerAddress = response;
+        }
+      });
+      items.forEach(item => {
+        cart_item.push({ product_id: item.productId, quantity: item.quantity });
+        total += item.price*item.quantity;
+      });      
+      const order: OrderDTO = {
+        user_id: this.tokenService.getUserId(),
+        fullname: this.orderForm.get('fullname')?.value,
+        phone_number: this.orderForm.get('phone_number')?.value,
+        shipping_address: this.orderForm.get('shipping_address')?.value,
+        note: this.orderForm.get('note')?.value,
+        payment_method: this.orderForm.get('payment_method')?.value,
+        shipping_method: this.orderForm.get('shipping_method')?.value,
+        cart_items: cart_item,
+        total_money: total,
+        address: sellerAddress
+      }
 
+      this.orderService.placeOrder(this.tokenService.getToken(), order).subscribe({
+        next: (response: any) => {
+          this.snackBar.open(response.message , 'Close', { duration: 3000 })
+        }
+      }); 
+    });
   }
   
 

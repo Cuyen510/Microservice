@@ -16,35 +16,57 @@ export class OrderService {
 
   constructor(private http: HttpClient) {}
 
-  placeOrder(orderData: OrderDTO): Observable<any> {    
-    return this.http.post(this.apiUrl, orderData);
+  placeOrder(token: string,orderData: OrderDTO): Observable<any> {    
+    return this.http.post(this.apiUrl, orderData,{
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      })
+    });
   }
   
-  getOrderById(orderId: number): Observable<any> {
-    const url = `${environment.apiBaseUrl}/orders/${orderId}`;
-    return this.http.get(url);
+  getOrderById(token: string,orderId: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/orders/${orderId}`,{
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      })
+    });
   }
 
-  getOrdersByUserId(userId: number): Observable<any> {
-    const url = `${environment.apiBaseUrl}/orders/user/${userId}`;
-    return this.http.get(url);
+  getOrdersByUserId(token: string,userId: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/orders/user/${userId}`,{
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      })
+    });
   }
 
-  getAllOrders(keyword:string, user_id: number,
+  getAllOrders(token: string,keyword:string, user_id: number,
       page: number, limit: number
-  ): Observable<ApiResponse> {
+  ): Observable<any> {
       const params = new HttpParams()
       .set('user_id', user_id.toString())
       .set('keyword', keyword)      
       .set('page', page.toString())
-      .set('limit', limit.toString());            
-      return this.http.get<ApiResponse>(this.apiUrl+'/user', { params });
+      .set('limit', limit.toString());    
+
+      const headers = new HttpHeaders({
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      });    
+      return this.http.get<any>(this.apiUrl+'/user', { headers, params })
   }
 
-  cancelOrder(orderId: number): Observable<ApiResponse> {
+  cancelOrder(token: string, orderId: number): Observable<any> {
     const params = new HttpParams()
-    .set('id', orderId)                 
-    return this.http.put<ApiResponse>(this.apiUrl, { params });
+    .set('id', orderId)
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    });                 
+    return this.http.put<any>(this.apiUrl, { headers, params });
   }
 
 }

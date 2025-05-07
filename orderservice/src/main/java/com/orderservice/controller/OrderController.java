@@ -2,6 +2,7 @@ package com.orderservice.controller;
 
 import com.orderservice.dto.OrderDTO;
 import com.orderservice.exceptions.DataNotFoundException;
+import com.orderservice.response.OrderResponse;
 import com.orderservice.service.KafkaBridgeService;
 import com.orderservice.service.OrderService;
 import jakarta.validation.Valid;
@@ -50,10 +51,11 @@ public class OrderController {
         String response = future.get(5, TimeUnit.SECONDS);
 
         if (!response.equals("ok")) {
-            return ResponseEntity.badRequest().body("Not enough stock: " + response);
+            return ResponseEntity.badRequest().body(OrderResponse.builder().message("Not enough stock: " + response).build());
         }
 
-        return ResponseEntity.ok().body(orderService.createOrder(orderDTO));
+        return ResponseEntity.ok().body(OrderResponse.builder().order(orderService.createOrder(orderDTO))
+                                                                .message("Order placed").build());
     }
 
     @GetMapping("")
@@ -93,7 +95,7 @@ public class OrderController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> cancelOrder(@PathVariable("id") Long id) throws DataNotFoundException, ExecutionException, InterruptedException, TimeoutException {
         orderService.cancelOrder(id);
-        return ResponseEntity.ok().body("order canceled");
+        return ResponseEntity.ok().body(OrderResponse.builder().message("Order canceled").build());
     }
 
 }

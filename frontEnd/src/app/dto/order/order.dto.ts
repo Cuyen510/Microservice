@@ -6,8 +6,6 @@ export class OrderDTO {
   phone_number: string;
     
   address: string;
-  
-  status: string;
 
   note: string;
     
@@ -18,10 +16,6 @@ export class OrderDTO {
   shipping_address: string;
   
   payment_method: string;
-
-  shipping_date: Date;
-
-  tracking_number: string;
   
   cart_items: { product_id: number, quantity: number }[]; 
   
@@ -35,9 +29,6 @@ export class OrderDTO {
     this.shipping_method = data.shipping_method;
     this.payment_method = data.payment_method;
     this.cart_items = data.cart_items;
-    this.status = data.status;
-    this.shipping_date = data.shipping_date;
-    this.tracking_number = data.tracking_number;
     this.shipping_address = data.shipping_address;
   }
 }
