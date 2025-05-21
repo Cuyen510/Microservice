@@ -1,0 +1,66 @@
+<app-header></app-header>
+<div class="container">
+    <div class="intro-section">
+        <h1>Order details</h1>
+    </div>
+    
+    @if(orderResponse) {
+        <div class="row">
+            <div class="col-md-6">
+                <h2 class="product-header">Receiver information</h2>
+                <div class="mb-3">
+                    <p class="form-label">Fullname: {{ orderResponse.fullname }}</p>
+                </div>
+                <div class="mb-3">
+                    <p class="form-label">Phone number: {{ orderResponse.phone_number }}</p>
+                </div>
+                <div class="mb-3">
+                    <p class="form-label">Address: {{ orderResponse.address }}</p>
+                </div>
+                <div class="mb-3">
+                    <p class="form-label">Note: {{ orderResponse.note }}</p>
+                </div>
+                <div class="mb-3">
+                    <p class="form-label">Shipping method: {{ orderResponse.shipping_method }}</p>
+                </div>
+                <div class="mb-3">
+                    <p class="form-label">Payment method: {{ orderResponse.payment_method }}</p>
+                </div>                        
+            </div>
+    
+            <div class="col-md-6">
+                <h2 class="product-order">Products ordered</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th scope="col" class="text-start">Product</th>
+                            <th scope="col">Quantity</th>
+                            <th scope="col">Price</th>
+                            <th scope="col">Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for(item of orderResponse.order_details; track item.product.name) {
+                            <tr>
+                                <td>
+                                    <div class="product-info">
+                                        <img [src]="item.product.thumbnail" alt="Product Image" class="product-image">
+                                        <span class="product-name">{{ item.product.name }}</span>
+                                    </div>
+                                </td>
+                                <td>{{ item.numberOfProduct}}</td>
+                                <td>{{ item.product.price | number:'1.2-2' }}</td>
+                                <td>{{ item.totalMoney| number:'1.2-2' }}</td>
+                            </tr>
+                        }                        
+                    </tbody>
+                </table>
+                <div class="text-start mt-3">
+                    <h4 class="header-text text-end">Total: {{ orderResponse.total_money | number:'1.2-2' }}</h4>
+                </div>            
+            </div>
+        </div>    
+}    
+</div>
+<app-footer></app-footer>
+
