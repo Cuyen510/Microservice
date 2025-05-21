@@ -37,12 +37,12 @@
           - id: user-public-routes
             uri: http://localhost:9002
             predicates:
-              - Path=/api/v1/users/register, /api/v1/users/login, /api/v1/roles/**
+              - Path=/api/v1/users/register, /api/v1/users/login, /api/v1/roles/**, /api/v1/users/userAddress
 
           - id: user-protected-routes
             uri: http://localhost:9002
             predicates:
-              - Path=/api/v1/users/{id}, /api/v1/users
+              - Path=/api/v1/users/{id}, /api/v1/users,
             filters:
               - AuthFilter
 

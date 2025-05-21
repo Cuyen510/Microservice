@@ -4,6 +4,7 @@ import com.userservice.dto.UserLoginDTO;
 import com.userservice.model.User;
 import com.userservice.exceptions.DataNotFoundException;
 import com.userservice.dto.UserDTO;
+import com.userservice.response.UserAddressResponse;
 import com.userservice.response.UserLoginResponse;
 import com.userservice.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -79,20 +80,9 @@ public class UserController {
         }
     }
 
-    @GetMapping("/userAddress/{id}")
-    public ResponseEntity<?> getUserAddress(@PathVariable Long id, BindingResult result) throws DataNotFoundException {
-        try {
-            if(result.hasErrors()) {
-                List<String> errorMessages = result.getFieldErrors()
-                        .stream()
-                        .map(FieldError::getDefaultMessage)
-                        .toList();
-                return ResponseEntity.badRequest().body(errorMessages);
-            }
-            return ResponseEntity.ok().body(userService.getUserAddress(id));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    @GetMapping("/userAddress")
+    public ResponseEntity<?> getUserAddress(@RequestParam Long userId) throws DataNotFoundException {
+            return ResponseEntity.ok().body(UserAddressResponse.builder().address(userService.getUserAddress(userId)).build());
     }
 
     @GetMapping("")

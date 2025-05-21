@@ -16,7 +16,7 @@ export class UserService {
 
   private apiRegister= `${environment.apiBaseUrl}/users/register`;
   private apiLogin= `${environment.apiBaseUrl}/users/login`;
-  private apiUserDetail = `${environment.apiBaseUrl}/users/details`;
+  private apiUserDetail = `${environment.apiBaseUrl}/users`;
   private apiConfig = {
     headers: this.createHeaders()
   }
@@ -43,13 +43,10 @@ export class UserService {
     })
   }
 
-  getUserAddress(token: string, userId: number): Observable<any>{
-    return this.http.get<any>(`${this.apiUserDetail}/${userId}`, {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
-      })
-    })
+  getUserAddress(userId: number): Observable<any>{
+    const params = {
+      userId: userId};
+    return this.http.get<any>(`${this.apiUserDetail}/userAddress`, {params})
   }
 
 

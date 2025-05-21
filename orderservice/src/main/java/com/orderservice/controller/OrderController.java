@@ -2,12 +2,16 @@ package com.orderservice.controller;
 
 import com.orderservice.dto.OrderDTO;
 import com.orderservice.exceptions.DataNotFoundException;
+import com.orderservice.model.Order;
+import com.orderservice.response.ApiResponse;
+import com.orderservice.response.OrderListResponse;
 import com.orderservice.response.OrderResponse;
 import com.orderservice.service.KafkaBridgeService;
 import com.orderservice.service.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
@@ -48,25 +52,30 @@ public class OrderController {
         kafkaBridgeService.put(orderDTO.getPhoneNumber(), future);
         kafkaTemplate.send(productStockRequest, orderDTO.getPhoneNumber()+"-"+orderDTO.getCartItems().toString());
 
-        String response = future.get(5, TimeUnit.SECONDS);
+        String response = future.get(15, TimeUnit.SECONDS);
 
         if (!response.equals("ok")) {
-            return ResponseEntity.badRequest().body(OrderResponse.builder().message("Not enough stock: " + response).build());
+            return ResponseEntity.badRequest().body(ApiResponse.builder().message("Not enough stock: " + response).build());
         }
-
-        return ResponseEntity.ok().body(OrderResponse.builder().order(orderService.createOrder(orderDTO))
-                                                                .message("Order placed").build());
+        orderService.createOrder(orderDTO);
+        return ResponseEntity.ok().body(ApiResponse.builder().message("Order placed").build());
     }
 
     @GetMapping("")
-    public ResponseEntity<?> getAllOrder(
+    public ResponseEntity<?> getAllOrderByUserId(
+            @RequestParam Long userId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int limit){
         PageRequest pageRequest = PageRequest.of(
                 page, limit,
                 Sort.by("orderDate").descending()
         );
-        return ResponseEntity.ok().body(orderService.getAllOrders(pageRequest));
+        Page<Order> orderPage = orderService.getAllOrdersByUserId(userId, pageRequest);
+        List<OrderResponse> orders = orderPage.getContent()
+                .stream()
+                .map(OrderResponse::fromOrder)
+                .toList();
+        return ResponseEntity.ok().body(OrderListResponse.builder().orders(orders).totalPages(orderPage.getTotalPages()).build());
     }
 
     @GetMapping("/search")
@@ -95,7 +104,7 @@ public class OrderController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> cancelOrder(@PathVariable("id") Long id) throws DataNotFoundException, ExecutionException, InterruptedException, TimeoutException {
         orderService.cancelOrder(id);
-        return ResponseEntity.ok().body(OrderResponse.builder().message("Order canceled").build());
+        return ResponseEntity.ok().body(ApiResponse.builder().message("Order canceled").build());
     }
 
 }

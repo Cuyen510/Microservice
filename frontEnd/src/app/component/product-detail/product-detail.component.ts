@@ -122,7 +122,8 @@ export class ProductDetailComponent implements OnInit {
   addToCart(): void {
     const cartItem: CartItemDTO = {
       product_id: this.productId,
-      quantity: this.quantity
+      quantity: this.quantity,
+      price: this.product!.price
     }
   
     this.cartService.addToCart(this.tokenService.getToken(),this.tokenService.getUserId(),cartItem).subscribe({

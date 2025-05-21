@@ -50,6 +50,7 @@
               <p>Description: {{ product?.description }}</p>
               <p>Price: ${{ product?.price }}</p>
               <p>Total: ${{ getTotalPrice() | number:'1.2-2' }}</p>
+              <p>Stock: {{ product?.stock }}</p>
               <div class="product-actions">
                 <button class="btn btn-primary" (click)="addToCart()">Add to cart</button>
                 <!-- <button class="btn btn-success">Buy now</button> -->

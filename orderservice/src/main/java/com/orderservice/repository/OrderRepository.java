@@ -13,6 +13,8 @@ import java.util.List;
 public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Order> findByUserId(Long userId);
 
+    Page<Order> findByUserId(Long userId, Pageable pageable);
+
 
     @Query("SELECT o FROM Order o " +
         "WHERE (o.userId = :userId OR :userId IS NULL) " +

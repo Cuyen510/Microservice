@@ -19,7 +19,7 @@ import { UserService } from '../../service/user.service';
 
 @Component({
   selector: 'app-cart',
-  imports: [CommonModule, HeaderComponent, FooterComponent, ReactiveFormsModule, MatSnackBarModule ],
+  imports: [CommonModule, HeaderComponent, FooterComponent, ReactiveFormsModule, MatSnackBarModule],
   standalone: true,
   templateUrl: './cart.component.html',
   styleUrl: './cart.component.scss'
@@ -46,7 +46,7 @@ export class CartComponent {
   ) {
     this.orderForm = this.formBuilder.group({
       fullname: [this.tokenService.getUser().fullname, Validators.required],    
-      phone_number: [this.tokenService.getUser().phone_number, [Validators.required, Validators.minLength(6)]], 
+      phone_number: [this.tokenService.getUser().phoneNumber, [Validators.required, Validators.minLength(6)]], 
       address: ["", [Validators.required, Validators.minLength(5)]], 
       note: [''],
       shipping_method: [''],
@@ -100,7 +100,7 @@ export class CartComponent {
           error: err => this.snackBar.open(err.error.message || 'An error occurred', 'Close', { duration: 3000 })
         });
       },
-      error: err => this.snackBar.open(err.error.message || 'An error occurred', 'Close', { duration: 3000 })
+      error: err => this.snackBar.open(err.error.message || 'Cart is empty', 'Close', { duration: 3000 })
     });
   }
   
@@ -113,7 +113,8 @@ export class CartComponent {
     item.quantity++;
     const cartItem: CartItemDTO = {
       product_id: item.productId,
-      quantity: item.quantity
+      quantity: item.quantity,
+      price: item.price
     }
     this.cartService.updateCartItem(
       this.tokenService.getToken(),
@@ -131,6 +132,7 @@ export class CartComponent {
     const cartItem: CartItemDTO = {
       product_id: item.productId,
       quantity: item.quantity,
+      price: item.price
     }
     this.cartService.updateCartItem(
       this.tokenService.getToken(),
@@ -151,40 +153,50 @@ export class CartComponent {
   }
   
 
-  confirmOrder(): void{
+  confirmOrder(): void {
     Object.entries(this.groupedCartItems).forEach(([sellerId, items]) => {
       let total = 0;
       const cart_item: CartItemDTO[] = [];
-      let sellerAddress = '';
-      this.userService.getUserAddress(this.tokenService.getToken(), parseInt(sellerId, 10)).subscribe({
-        next: (response: any) =>{
-          sellerAddress = response;
+  
+      items.forEach(item => {
+        cart_item.push({ product_id: item.productId, quantity: item.quantity, price: item.price });
+        total += item.price * item.quantity;
+      });
+  
+      this.userService.getUserAddress(parseInt(sellerId,10)).subscribe({
+        next: (response: any) => {
+          debugger
+          const sellerAddress = response.address;
+  
+          const order: OrderDTO = {
+            user_id: this.tokenService.getUserId(),
+            fullname: this.orderForm.get('fullname')?.value,
+            phone_number: this.orderForm.get('phone_number')?.value,
+            shipping_address: this.orderForm.get('shipping_address')?.value,
+            note: this.orderForm.get('note')?.value,
+            payment_method: this.orderForm.get('payment_method')?.value,
+            shipping_method: this.orderForm.get('shipping_method')?.value,
+            cart_items: cart_item,
+            total_money: total,
+            address: sellerAddress
+          };
+  
+          this.orderService.placeOrder(this.tokenService.getToken(), order).subscribe({
+            next: (res) => {
+              this.snackBar.open(res.message, 'Close', { duration: 3000 });
+            },
+            error: (err) => {
+              this.snackBar.open(err.message || 'Order failed', 'Close', { duration: 3000 });
+            }
+          });
+        },
+        error: (err) => {
+          this.snackBar.open(err.message || 'Failed to fetch seller address', 'Close', { duration: 3000 });
         }
       });
-      items.forEach(item => {
-        cart_item.push({ product_id: item.productId, quantity: item.quantity });
-        total += item.price*item.quantity;
-      });      
-      const order: OrderDTO = {
-        user_id: this.tokenService.getUserId(),
-        fullname: this.orderForm.get('fullname')?.value,
-        phone_number: this.orderForm.get('phone_number')?.value,
-        shipping_address: this.orderForm.get('shipping_address')?.value,
-        note: this.orderForm.get('note')?.value,
-        payment_method: this.orderForm.get('payment_method')?.value,
-        shipping_method: this.orderForm.get('shipping_method')?.value,
-        cart_items: cart_item,
-        total_money: total,
-        address: sellerAddress
-      }
-
-      this.orderService.placeOrder(this.tokenService.getToken(), order).subscribe({
-        next: (response: any) => {
-          this.snackBar.open(response.message , 'Close', { duration: 3000 })
-        }
-      }); 
     });
   }
+  
   
 
   calculateTotal(): void {

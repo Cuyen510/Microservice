@@ -3,9 +3,9 @@ package com.orderservice.service;
 import com.orderservice.dto.CartItemDTO;
 import com.orderservice.dto.OrderDTO;
 import com.orderservice.exceptions.DataNotFoundException;
-import com.orderservice.model.Order;
-import com.orderservice.model.OrderDetail;
-import com.orderservice.model.OrderStatus;
+import com.orderservice.model.*;
+import com.orderservice.repository.CartItemRepository;
+import com.orderservice.repository.CartRepository;
 import com.orderservice.repository.OrderDetailRepository;
 import com.orderservice.repository.OrderRepository;
 import jakarta.transaction.Transactional;
@@ -34,6 +34,8 @@ public class OrderService {
 
     @Value("${kafka.topic.productStockUpdate}")
     private String productStockUpdate;
+    private final CartItemRepository cartItemRepository;
+    private final CartRepository cartRepository;
 
     @Transactional
     public Order createOrder(OrderDTO orderDTO) throws DataNotFoundException {
@@ -41,6 +43,7 @@ public class OrderService {
         order.setFullname(orderDTO.getFullname());
         order.setNote(orderDTO.getNote());
         order.setUserId(orderDTO.getUserId());
+        order.setAddress(orderDTO.getAddress());
         order.setOrderDate(LocalDate.now());
         order.setStatus(OrderStatus.PENDING);
         order.setPaymentMethod(orderDTO.getPaymentMethod());
@@ -57,9 +60,11 @@ public class OrderService {
         order.setActive(true);
         order.setTotalMoney(orderDTO.getTotalMoney());
         orderRepository.save(order);
-
+        Cart cart = cartRepository.findByUserId(orderDTO.getUserId()).orElseThrow(()-> new DataNotFoundException("Cant find cart"));
         for (CartItemDTO cartItemDTO : orderDTO.getCartItems()) {
             OrderDetail orderDetail = new OrderDetail();
+
+            CartItem cartItem = cartItemRepository.findByProductIdAndCartId(cartItemDTO.getProductId(),cart.getId()).orElseThrow(()-> new DataNotFoundException("Cant find cart"));
             orderDetail.setOrder(order);
 
             Long productId = cartItemDTO.getProductId();
@@ -70,6 +75,12 @@ public class OrderService {
             orderDetail.setPrice(price);
             orderDetail.setTotalMoney(quantity * price);
             orderDetailRepository.save(orderDetail);
+
+            if(cartItemDTO.getQuantity() == cartItem.getQuantity()){
+                cartItemRepository.delete(cartItem);
+            }else{
+                cartItem.setQuantity(cartItem.getQuantity() - cartItemDTO.getQuantity());
+            }
         }
         return order;
     }
@@ -84,6 +95,7 @@ public class OrderService {
         Order order = orderRepository.findById(id).orElseThrow(()-> new DataNotFoundException("Order not found"));
         order.setFullname(orderDTO.getFullname());
         order.setNote(orderDTO.getNote());
+        order.setAddress(orderDTO.getAddress());
         order.setUserId(orderDTO.getUserId());
         order.setOrderDate(LocalDate.now());
         order.setStatus(orderDTO.getStatus());
@@ -124,8 +136,8 @@ public class OrderService {
         return orderRepository.searchOrders(userId, keyword, pageable);
     }
 
-    public Page<Order> getAllOrders(Pageable pageable){
-        return orderRepository.getAllOrders(pageable);
+    public Page<Order> getAllOrdersByUserId(Long userId, Pageable pageable){
+        return orderRepository.findByUserId(userId, pageable);
     }
 
 }
