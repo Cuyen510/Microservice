@@ -26,7 +26,7 @@ export class OrderService {
   }
   
   getOrderById(token: string,orderId: number): Observable<any> {
-    return this.http.get(`${this.apiUrl}/${orderId}`,{
+    return this.http.get(`${this.apiUrl}/search/${orderId}`,{
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`
@@ -36,7 +36,7 @@ export class OrderService {
 
   getAllOrdersByUserId(token: string, user_id: number,
     page: number, limit: number
-): Observable<any> {
+  ): Observable<any> {
     const params = new HttpParams()
     .set('userId', user_id.toString()) 
     .set('page', page.toString())
@@ -47,7 +47,7 @@ export class OrderService {
       Authorization: `Bearer ${token}`
     });    
     return this.http.get<any>(`${this.apiUrl}`, { headers, params })
-}
+  }
 
   getAllOrders(token: string,keyword:string, user_id: number,
       page: number, limit: number
@@ -65,14 +65,13 @@ export class OrderService {
       return this.http.get<any>(this.apiUrl+'/user', { headers, params })
   }
 
+
   cancelOrder(token: string, orderId: number): Observable<any> {
-    const params = new HttpParams()
-    .set('id', orderId)
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`
     });                 
-    return this.http.put<any>(this.apiUrl, { headers, params });
+    return this.http.delete<any>(`${this.apiUrl}/${orderId}`, { headers });
   }
 
 }

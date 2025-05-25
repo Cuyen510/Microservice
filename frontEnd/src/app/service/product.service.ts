@@ -54,6 +54,15 @@ export class ProductService {
     return this.http.get<Product[]>(`${this.apiBaseUrl}/products/by-ids?`+ params);
   }
 
+  getProductsByUserId(userId: number, page: number, limit: number): Observable<Product[]> {
+    const params = {
+      userId: userId,
+      page: page,
+      limit: limit
+    };
+    return this.http.get<Product[]>(`${this.apiBaseUrl}/products/user`, {params});
+  }
+
   deleteProduct(productId: number): Observable<ApiResponse> {
     debugger
     return this.http.delete<ApiResponse>(`${this.apiBaseUrl}/products/${productId}`);

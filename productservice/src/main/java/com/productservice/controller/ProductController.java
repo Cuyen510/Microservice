@@ -190,18 +190,25 @@ public class ProductController {
         }
     }
 
-    @GetMapping("/user/{user_id}")
-    public ResponseEntity<?> getProductByUserId(@PathVariable("user_id") Long userId) {
-        try {
-            List<Product> productList = productService.getProductByUserId(userId);
-            List<ProductResponse> productResponseList = new ArrayList<>();
-            productList.forEach(product -> {
-                productResponseList.add(ProductResponse.fromProduct(product));
-            });
-            return ResponseEntity.ok().body(productResponseList);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    @GetMapping("/user")
+    public ResponseEntity<?> getProductByUserId(@RequestParam() Long userId,
+                                                @RequestParam(defaultValue = "0") int page,
+                                                @RequestParam(defaultValue = "10") int limit) {
+            PageRequest pageRequest = PageRequest.of(
+                    page, limit,
+                    Sort.by("id").ascending()
+            );
+            Page<Product> productPage = productService.getProductByUserId(userId, pageRequest);
+            int totalPages = productPage.getTotalPages();
+            List<ProductResponse> products = productPage.getContent()
+                    .stream()
+                    .map(ProductResponse::fromProduct)
+                    .toList();
+            return ResponseEntity.ok(ProductListResponse
+                    .builder()
+                    .products(products)
+                    .totalPages(totalPages)
+                    .build());
     }
 
     @GetMapping("/by-ids")

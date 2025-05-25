@@ -91,8 +91,9 @@ public class UserService {
     }
 
     public User updateUser(Long id, UserDTO userDTO) throws DataNotFoundException {
-        User user =  userRepository.findById(id).orElseThrow(()->new DataNotFoundException("Wrong phone number or password"));
+        User user =  userRepository.findById(id).orElseThrow(()->new DataNotFoundException("Cant find user"));
         BeanUtils.copyProperties(userDTO, user);
+        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         return userRepository.save(user);
     }
 

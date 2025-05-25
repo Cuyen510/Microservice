@@ -8,6 +8,7 @@ import com.productservice.model.Product;
 import com.productservice.model.ProductImage;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 
 import java.util.List;
@@ -27,7 +28,7 @@ public interface IProductService {
 
     ProductImage createProductImage(Long productId, ProductImageDTO productImageDTO) throws DataNotFoundException, InvalidParamException;
 
-    List<Product> getProductByUserId(Long userId);
+    Page<Product> getProductByUserId(Long userId, Pageable pageable);
 
     List<Product> findProductByIds(List<Long> productIds);
 

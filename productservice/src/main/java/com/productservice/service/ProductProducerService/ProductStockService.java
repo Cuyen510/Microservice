@@ -42,8 +42,6 @@ public class ProductStockService {
             Product product = productRepository.findById(productId).orElseThrow(() -> new DataNotFoundException("product not found"));
             if (product.getStock() < quantity) {
                 itemList.add(product.getName());
-            }else{
-                product.setStock(product.getStock()-quantity);
             }
         }
         String result;
@@ -57,23 +55,34 @@ public class ProductStockService {
     @Transactional
     @KafkaListener(topics = "${kafka.topic.productStockUpdate}", groupId = "product-group")
     public void updateProductStock(String request) throws DataNotFoundException {
+        String result = "updated";
         String[] parts = request.split("-");
         String requestId = parts[0];
-        int start = parts[1].indexOf('[') + 1;
-        int end = parts[1].indexOf(']');
-        parts[1] = parts[1].substring(start, end);
-        for (String item : List.of(parts[1].split(", "))) {
+        int start = parts[2].indexOf('[') + 1;
+        int end = parts[2].indexOf(']');
+        parts[2] = parts[2].substring(start, end);
+        for (String item : List.of(parts[2].split(", "))) {
             String[] itemParts = item.split(":");
             Long productId = Long.valueOf(itemParts[0]);
             int quantity = Integer.valueOf(itemParts[1]);
             Product product = productRepository.findById(productId).orElseThrow(() -> new DataNotFoundException("product not found"));
-            product.setStock(product.getStock()+quantity);
+            if(parts[1].equals("cancel")) {
+                product.setStock(product.getStock() + quantity);
+            }else if(parts[1].equals("create")){
+                int currentStock = product.getStock();
+                if (currentStock < quantity) {
+                    result = "OOS";
+                } else {
+                    product.setStock(currentStock - quantity);
+                }
+
+            }
             productRepository.save(product);
         }
 
-        String result = requestId+"-"+"updated";
 
-        kafkaTemplate.send(productStockUpdateResponse, result);
+
+        kafkaTemplate.send(productStockUpdateResponse, requestId+"-"+result);
     }
 
 }

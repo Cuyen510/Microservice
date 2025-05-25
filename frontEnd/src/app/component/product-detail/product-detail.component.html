@@ -45,25 +45,29 @@
           </div>
         </div>
         <div class="col-md-6">
+          <div class="product-detail-container">
             <div class="product-detail">
               <h2>{{ product?.name }}</h2>
-              <p>Description: {{ product?.description }}</p>
-              <p>Price: ${{ product?.price }}</p>
-              <p>Total: ${{ getTotalPrice() | number:'1.2-2' }}</p>
-              <p>Stock: {{ product?.stock }}</p>
+              <p><strong>Description:</strong> {{ product?.description }}</p>
+              <p><strong>Price:</strong> ${{ product?.price }}</p>
+              <p><strong>Total:</strong> ${{ getTotalPrice() | number:'1.2-2' }}</p>
+              <p><strong>Stock:</strong> {{ product?.stock }}</p>
+
               <div class="product-actions">
                 <button class="btn btn-primary" (click)="addToCart()">Add to cart</button>
-                <!-- <button class="btn btn-success">Buy now</button> -->
               </div>
-                <div class="product-quantity">
-                  <div class="border-wrapper">
-                    <button (click)="decreaseQuantity()">-</button>
-                    <input type="text" [value]="quantity">
-                    <button (click)="increaseQuantity()">+</button>
-                  </div>
+
+              <div class="product-quantity">
+                <div class="border-wrapper">
+                  <button (click)="decreaseQuantity()">-</button>
+                  <input type="text" [value]="quantity">
+                  <button (click)="increaseQuantity()">+</button>
                 </div>
+              </div>
             </div>
+          </div>
         </div>
+
     </div>
 </div>
 <app-footer></app-footer>

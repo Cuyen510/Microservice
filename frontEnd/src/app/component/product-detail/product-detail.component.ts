@@ -10,8 +10,6 @@ import { HeaderComponent } from '../header/header.component';
 import { FooterComponent } from '../footer/footer.component';
 import { CartService } from '../../service/cart.service';
 import { TokenService } from '../../service/token.service';
-import { UpdateCartDTO } from '../../dto/cart/cart.dto';
-import { CartItem } from '../../model/cartItem';
 import { CartItemDTO } from '../../dto/cart/cartItem.dto';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { AddToCartReponse } from '../../response/cart/addToCart.response';

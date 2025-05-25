@@ -34,6 +34,7 @@ public class OrderService {
 
     @Value("${kafka.topic.productStockUpdate}")
     private String productStockUpdate;
+
     private final CartItemRepository cartItemRepository;
     private final CartRepository cartRepository;
 
@@ -75,12 +76,7 @@ public class OrderService {
             orderDetail.setPrice(price);
             orderDetail.setTotalMoney(quantity * price);
             orderDetailRepository.save(orderDetail);
-
-            if(cartItemDTO.getQuantity() == cartItem.getQuantity()){
-                cartItemRepository.delete(cartItem);
-            }else{
-                cartItem.setQuantity(cartItem.getQuantity() - cartItemDTO.getQuantity());
-            }
+            cartItemRepository.delete(cartItem);
         }
         return order;
     }
@@ -120,11 +116,12 @@ public class OrderService {
         Order order = orderRepository.findById(id).orElseThrow(()-> new DataNotFoundException("Can't find order with id: "+id));
         CompletableFuture<String> future = new CompletableFuture<>();
         kafkaBridgeService.put(String.valueOf(id), future);
-        kafkaTemplate.send(productStockUpdate, id+"-"+order.getOrderDetails().toString());
+        kafkaTemplate.send(productStockUpdate, id+"-cancel-"+order.getOrderDetails().toString());
 
         String response = future.get(5, TimeUnit.SECONDS);
 
         if (response.equals("updated")) {
+            order.setStatus("canceled");
             order.setActive(false);
             orderRepository.save(order);
         }else{

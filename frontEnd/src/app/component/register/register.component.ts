@@ -50,15 +50,6 @@ export class RegisterComponent {
   }
 
   register(){
-    const message = `phone:${this.phoneNumber}`+
-                    `password:${this.password}`+
-                    `retypePassword:${this.retypePassword}`+
-                    `fullName:${this.fullName}`+
-                    `address:${this.address}`+
-                    `isAccepted:${this.isAccepted}`+
-                    `dateOfBirth:${this.dateOfBirth}`
-    //alert(message);
-    
     const registerDTO:  RegisterDTO= {
         "fullname": this.fullName,
         "phone_number": this.phoneNumber,

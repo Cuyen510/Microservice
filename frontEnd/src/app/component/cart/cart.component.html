@@ -1,6 +1,6 @@
 <app-header></app-header>
 <div class="container">
-    <h1>Your Cart</h1>
+    <h1>My Cart</h1>
 
   <table id="cart-table">
     <thead>
@@ -27,14 +27,14 @@
             <span class="mx-2">{{ item.quantity }}</span>
             <button (click)="increaseQuantity(item)">+</button>
           </td>
-          <td>{{ (item.price * item.quantity) | number:'1.2-2' }}</td>
+          <td>${{ (item.price * item.quantity) | number:'1.2-2' }}</td>
         </tr>
       </ng-container>
     </tbody>
   </table>
   
   <div class="text-start mt-3">
-    <h4 class="header-text text-end ">Total: {{ totalAmount | number:'1.2-2'}}</h4>
+    <h4 class="header-text text-end ">Total: ${{ totalAmount | number:'1.2-2'}}</h4>
   </div>
   <button (click)="placeOrder()">Place order</button>
   <form *ngIf="showOrderForm" [formGroup]="orderForm">

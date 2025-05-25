@@ -84,6 +84,7 @@ public class OrderResponse  {
                 .shippingDate(order.getShippingDate())
                 .paymentMethod(order.getPaymentMethod())
                 .orderDetails(order.getOrderDetails())
+                .trackingNumber(order.getTrackingNumber())
                 .build();
         return orderResponse;
     }

@@ -110,8 +110,8 @@ public class ProductService implements IProductService {
     }
 
     @Override
-    public List<Product> getProductByUserId(Long userId){
-        return productRepository.findByUserId(userId);
+    public Page<Product> getProductByUserId(Long userId, Pageable pageable){
+        return productRepository.findByUserId(userId, pageable);
     }
 
     @Override

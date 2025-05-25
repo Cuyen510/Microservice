@@ -34,8 +34,8 @@ export class UserService {
     return this.http.post(this.apiLogin, loginDTO,this.apiConfig);
   }
 
-  getUserDetail(token: string): Observable<any> {
-    return this.http.get<any>(this.apiUserDetail, {
+  getUserDetail(token: string, userId: number): Observable<any> {
+    return this.http.get<any>(`${this.apiUserDetail}/${userId}`, {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`

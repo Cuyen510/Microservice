@@ -1,0 +1,42 @@
+<app-header></app-header>
+<div class="container">
+  <div class="profile-card">
+    <h2 class="profile-title">Edit Profile</h2>
+    <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label>Full Name</label>
+        <input formControlName="fullname" type="text" class="form-control" />
+      </div>
+      <div class="form-group">
+        <label>Phone Number</label>
+        <input formControlName="phoneNumber" type="text" class="form-control" />
+      </div>
+      <div class="form-group">
+        <div class="form-group password-group">
+          <label>Password</label>
+          <div class="password-wrapper">
+            <input formControlName="password" [type]="showPassword ? 'text' : 'password'" class="form-control" placeholder="At least 3 characters" />
+            <i class="password-toggle fas" [ngClass]="showPassword ? 'fa-eye' : 'fa-eye-slash'" (click)="togglePassword()"></i>
+          </div>
+        </div>
+      </div>
+        <div class="form-group password-group">
+          <label>Retype Password</label>
+          <div class="password-wrapper">
+            <input formControlName="retypePassword" [type]="showPassword ? 'text' : 'password'" class="form-control" />
+            <i class="password-toggle fas" [ngClass]="showPassword ? 'fa-eye' : 'fa-eye-slash'" (click)="togglePassword()"></i>
+          </div>
+        </div>
+      <div class="form-group">
+        <label>Address</label>
+        <input formControlName="address" type="text" class="form-control" />
+      </div>
+      <div class="form-group">
+        <label>Date of Birth (MM-dd-yyyy)</label>
+        <input formControlName="dateOfBirth" type="date" class="form-control" />
+      </div>
+      <button class="btn btn-primary mt-3" type="submit" [disabled]="profileForm.invalid">Save Changes</button>
+    </form>
+  </div>
+</div>
+<app-footer></app-footer>

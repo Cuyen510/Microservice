@@ -27,8 +27,8 @@ export class LoginComponent {
 
   @ViewChild('loginForm') loginForm!: NgForm;
 
-  phone: string = "09850327";
-  password: string = '123';
+  phone: string = '';
+  password: string = '';
   rememberMe: boolean = true;
   showPassword: boolean = false;
   userResponse?: UserResponse

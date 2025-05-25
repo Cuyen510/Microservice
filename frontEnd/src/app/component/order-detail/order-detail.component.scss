@@ -1,45 +1,118 @@
 .container {
-    color: black;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f9f9f9;
 }
-.confirmation-container {
-    margin: 50px auto;
-    padding: 20px;
-    max-width: 600px;            
-    border-radius: 10px;
-    box-shadow: 0 0 5px rgba(255, 255, 255, 0.1);
+
+.intro-section {
+  text-align: center;
+  margin-bottom: 30px;
 }
+
+.intro-section h1 {
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: #2c3e50;
+}
+s
+.product-header,
+.product-order {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: #0056b3;
+}
+
+.mb-3 p.form-label {
+  font-size: 1rem;
+  margin-bottom: 5px;
+  color: #555;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  background-color: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+table thead tr {
+  background-color: #e9ecef;
+  color: #333;
+}
+
+table th,
+table td {
+  padding: 14px;
+  border: 1px solid #dee2e6;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 0.95rem;
+}
+
+table th.text-start,
+table td.text-start {
+  text-align: left;
+}
+
 .product-info {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .product-image {
-    width: 100px;
-    height: 100px;
-    border-radius: 5px;
-    margin-right: 10px;
+  width: 55px;
+  height: 55px;
+  object-fit: cover;
+  border-radius: 6px;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
 }
 
 .product-name {
-    color: black;
-    margin-right: 10px;
-}
-table {
-    width: 100%;
-    border-radius: 10px;
-    border: none;
-    border-collapse: separate;
-    border: 1px solid black;
-    border-spacing: 0;       
+  font-weight: 500;
+  color: #333;
 }
 
-th,
-td {
-    padding: 10px;
-    text-align: center;
+.header-text {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #198754;
 }
-.btn-gradient {
-    color: white;
-    border-radius: 30px;
-    width: 200px;
+
+.order-details-container {
+  background-color: #ffffff;
+  border-radius: 10px;
+  padding: 25px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+
+@media (max-width: 768px) {
+  .row {
+    flex-direction: column;
+  }
+
+  .col-md-6 {
+    width: 100%;
+    margin-bottom: 20px;
+  }
+
+  table th,
+  table td {
+    font-size: 0.85rem;
+    padding: 10px;
+  }
+
+  .intro-section h1 {
+    font-size: 2rem;
+  }
+
+  .header-text {
+    font-size: 1.2rem;
+  }
 }

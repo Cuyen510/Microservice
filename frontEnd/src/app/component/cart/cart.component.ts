@@ -97,7 +97,7 @@ export class CartComponent {
             this.groupCartItemsBySellerId();
             this.calculateTotal(); 
           },
-          error: err => this.snackBar.open(err.error.message || 'An error occurred', 'Close', { duration: 3000 })
+          error: err => this.snackBar.open(err.error.message || 'Cart is empty', 'Close', { duration: 3000 })
         });
       },
       error: err => this.snackBar.open(err.error.message || 'Cart is empty', 'Close', { duration: 3000 })
@@ -146,10 +146,11 @@ export class CartComponent {
               this.cartItem.splice(index, 1);
             }
           }
-          this.getCart();
+         
         },
         error: err => this.snackBar.open(err.error.message || 'An error occurred', 'Close', { duration: 3000 })
     });
+    this.getCart();
   }
   
 
@@ -195,6 +196,7 @@ export class CartComponent {
         }
       });
     });
+    this.getCart();
   }
   
   

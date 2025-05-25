@@ -59,25 +59,14 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getUserDetails(@PathVariable Long id,  HttpServletRequest request, BindingResult result) throws DataNotFoundException {
-        try {
-            if(result.hasErrors()) {
-                List<String> errorMessages = result.getFieldErrors()
-                        .stream()
-                        .map(FieldError::getDefaultMessage)
-                        .toList();
-                return ResponseEntity.badRequest().body(errorMessages);
+    public ResponseEntity<?> getUserDetails(@PathVariable Long id,  HttpServletRequest request) throws DataNotFoundException {
+        String role = request.getHeader("X-auth-role");
+        Long userId = Long.valueOf(request.getHeader("X-auth-userId"));
+        if(!role.equals("admin")|| role == null)
+            if(!userId.equals(id)){
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("UnAuthorize");
             }
-            String role = request.getHeader("X-auth-role");
-            Long userId = Long.valueOf(request.getHeader("X-auth-userId"));
-            if(!role.equals("admin")|| role == null)
-                if(!userId.equals(id)){
-                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("UnAuthorize");
-                }
-            return ResponseEntity.ok().body(userService.getUserDetails(id));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        return ResponseEntity.ok().body(userService.getUserDetails(id));
     }
 
     @GetMapping("/userAddress")
@@ -86,22 +75,11 @@ public class UserController {
     }
 
     @GetMapping("")
-    public ResponseEntity<?> getAllUsers(HttpServletRequest request, BindingResult result) throws DataNotFoundException {
-        try {
-            if(result.hasErrors()) {
-                List<String> errorMessages = result.getFieldErrors()
-                        .stream()
-                        .map(FieldError::getDefaultMessage)
-                        .toList();
-                return ResponseEntity.badRequest().body(errorMessages);
-            }
+    public ResponseEntity<?> getAllUsers(HttpServletRequest request) {
             String role = request.getHeader("X-auth-role");
             if(!role.equals("admin"))
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("UnAuthorize");
             return ResponseEntity.ok().body(userService.getAllUsers());
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
     }
 
     @PutMapping("/{id}")
@@ -127,22 +105,11 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteUser(@PathVariable Long id, HttpServletRequest request, BindingResult result){
-        try {
-            if(result.hasErrors()) {
-                List<String> errorMessages = result.getFieldErrors()
-                        .stream()
-                        .map(FieldError::getDefaultMessage)
-                        .toList();
-                return ResponseEntity.badRequest().body(errorMessages);
-            }
+    public ResponseEntity<?> deleteUser(@PathVariable Long id, HttpServletRequest request){
             String role = request.getHeader("X-auth-role");
             if(!role.equals("admin")|| role == null)
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("UnAuthorize");
             userService.DeleteUser(id);
             return ResponseEntity.ok().body("User deleted");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
     }
 }

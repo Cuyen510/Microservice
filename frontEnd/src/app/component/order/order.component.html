@@ -11,21 +11,28 @@
         <button class="btn btn-primary" (click)="searchOrders()">Search</button>
       </div>
     </div>
+    <div class="text-center mb-4">
+      <button class="btn btn-secondary" (click)="toggleOrders()">
+        {{ showCanceledOrders ? 'Show Active Orders' : 'Show Canceled Orders' }}
+      </button>
+    </div>
+
     <table class="table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Full Name</th>
-            <th>Phone Number</th>
-            <th>Shipping Address</th>
-            <th>Note</th>
-            <th>Order Date</th>
-            <th>Status</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for(order of orders; track order.id){
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Full Name</th>
+          <th>Phone Number</th>
+          <th>Deliver to Address</th>
+          <th>Note</th>
+          <th>Order Date</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for(order of displayOrder; track order.id) {
+          <!-- @if((!showCanceledOrders && order.status !== 'canceled') || (showCanceledOrders && order.status === 'canceled')) { -->
             <tr>
               <td>{{ order.id }}</td>
               <td>{{ order.fullname }}</td>
@@ -36,47 +43,53 @@
               <td>{{ order.status }}</td>
               <td class="text-center">
                 <div class="d-flex justify-content-center gap-2 flex-wrap">
-                <button 
-                  (click)="viewDetails(order)"
-                      class="btn btn-primary">
-                      View Details
-                </button>
-                <button class="btn btn-danger" 
-                  (click)="cancel(order.id)"
-                  >Cancel Order</button>                
+                  <button 
+                    (click)="viewDetails(order.id)"
+                    class="btn btn-primary">
+                    View Details
+                  </button>
+                  @if(order.status !== 'canceled') {
+                    <button class="btn btn-danger" 
+                            (click)="cancel(order.id)">
+                      Cancel Order
+                    </button>
+                  }
                 </div>
-              </td>                        
+              </td>
             </tr>
-          }          
-        </tbody>
-      </table>
+          }
+        <!-- } -->
+      </tbody>
+    </table>
+
+
     <div class="d-flex justify-content-center">
         <nav aria-label="Page navigation">
             <ul class="pagination">
                 @if(currentPage > 1) {
                   <li class="page-item" >
                     <a class="page-link" 
-                    (click)="onPageChange(0)">First</a>
+                    (click)="changePage(0)">First</a>
                   </li>
                   <li class="page-item" >
                       <a class="page-link" 
-                      (click)="onPageChange(currentPage - 1)">Previous</a>
+                      (click)="changePage(currentPage - 1)">Previous</a>
                   </li>
                 }
                 @for(page of visiblePages; track page) {
                   <ng-container>
                     <li class="page-item" [ngClass]="{'active': page === currentPage + 1}">
-                        <a class="page-link" (click)="onPageChange(page-1)">{{ page }}</a>
+                        <a class="page-link" (click)="changePage(page-1)">{{ page }}</a>
                     </li>
                   </ng-container>
                 }
                 
                 @if(currentPage < totalPages) {
                   <li class="page-item">
-                    <a class="page-link" (click)="onPageChange(currentPage + 1)">Next</a>
+                    <a class="page-link" (click)="changePage(currentPage + 1)">Next</a>
                   </li>
                   <li class="page-item">
-                      <a class="page-link" (click)="onPageChange(totalPages - 1)">Last</a>
+                      <a class="page-link" (click)="changePage(totalPages - 1)">Last</a>
                   </li>
                 }                
             </ul>

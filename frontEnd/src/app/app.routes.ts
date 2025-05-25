@@ -6,6 +6,8 @@ import { RegisterComponent } from './component/register/register.component';
 import { CartComponent } from './component/cart/cart.component';
 import { OrderComponent } from './component/order/order.component';
 import { OrderDetailComponent } from './component/order-detail/order-detail.component';
+import { UserProfileComponent } from './component/user-profile/user-profile.component';
+import { UserProductComponent } from './component/user-product/user-product.component';
 
 export const routes: Routes = [
     { path: '', component: HomeComponent },
@@ -15,5 +17,6 @@ export const routes: Routes = [
     { path: 'cart/:user_id', component: CartComponent},
     { path: 'order/:user_id', component: OrderComponent},
     { path: 'order_details/:order_id', component: OrderDetailComponent},
-    
+    { path: 'user_profile', component: UserProfileComponent},
+    { path: 'user_product/:user_id', component: UserProductComponent},
 ];
