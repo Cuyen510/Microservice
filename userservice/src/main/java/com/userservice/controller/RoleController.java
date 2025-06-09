@@ -1,7 +1,7 @@
 package com.userservice.controller;
 
 import com.userservice.model.Role;
-import com.userservice.service.RoleService;
+import com.userservice.service.RoleService.RoleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

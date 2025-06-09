@@ -1,4 +1,4 @@
-package com.orderservice.service;
+package com.orderservice.service.OrderService;
 
 import com.orderservice.dto.CartItemDTO;
 import com.orderservice.dto.OrderDTO;
@@ -8,6 +8,7 @@ import com.orderservice.repository.CartItemRepository;
 import com.orderservice.repository.CartRepository;
 import com.orderservice.repository.OrderDetailRepository;
 import com.orderservice.repository.OrderRepository;
+import com.orderservice.service.KafkaBridgeService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,7 +27,7 @@ import java.util.concurrent.TimeoutException;
 
 @RequiredArgsConstructor
 @Service
-public class OrderService {
+public class OrderService implements IOrderService {
     private final OrderRepository orderRepository;
     private final OrderDetailRepository orderDetailRepository;
     private final KafkaBridgeService kafkaBridgeService;

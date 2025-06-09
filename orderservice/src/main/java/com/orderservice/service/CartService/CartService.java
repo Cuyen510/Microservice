@@ -1,4 +1,4 @@
-package com.orderservice.service;
+package com.orderservice.service.CartService;
 
 import com.orderservice.dto.CartDTO;
 import com.orderservice.dto.CartItemDTO;
@@ -15,7 +15,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class CartService {
+public class CartService implements ICartService{
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
     public Cart createCart(Long userId){

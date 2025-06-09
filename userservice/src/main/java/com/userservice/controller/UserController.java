@@ -1,17 +1,14 @@
 package com.userservice.controller;
 
 import com.userservice.dto.UserLoginDTO;
-import com.userservice.model.User;
 import com.userservice.exceptions.DataNotFoundException;
 import com.userservice.dto.UserDTO;
 import com.userservice.response.UserAddressResponse;
-import com.userservice.response.UserLoginResponse;
-import com.userservice.service.UserService;
+import com.userservice.service.UserService.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;

@@ -7,7 +7,7 @@ import com.orderservice.response.ApiResponse;
 import com.orderservice.response.OrderListResponse;
 import com.orderservice.response.OrderResponse;
 import com.orderservice.service.KafkaBridgeService;
-import com.orderservice.service.OrderService;
+import com.orderservice.service.OrderService.IOrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,7 +32,7 @@ import java.util.concurrent.TimeoutException;
 @RequiredArgsConstructor
 @RequestMapping("api/v1/orders")
 public class OrderController {
-    private final OrderService orderService;
+    private final IOrderService orderService;
 
     private final KafkaTemplate<String, String> kafkaTemplate;
 

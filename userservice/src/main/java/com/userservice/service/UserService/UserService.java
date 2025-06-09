@@ -1,4 +1,4 @@
-package com.userservice.service;
+package com.userservice.service.UserService;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;

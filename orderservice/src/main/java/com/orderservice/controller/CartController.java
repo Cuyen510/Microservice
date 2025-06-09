@@ -5,7 +5,7 @@ import com.orderservice.dto.CartItemDTO;
 import com.orderservice.exceptions.DataNotFoundException;
 import com.orderservice.response.AddToCartResponse;
 import com.orderservice.response.UpdateCartResponse;
-import com.orderservice.service.CartService;
+import com.orderservice.service.CartService.ICartService;
 import com.orderservice.service.KafkaBridgeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,7 +23,7 @@ import java.util.concurrent.*;
 @RequiredArgsConstructor
 @RequestMapping("api/v1/cart")
 public class CartController {
-    private final CartService cartService;
+    private final ICartService cartService;
 
     private final KafkaTemplate<String, String> kafkaTemplate;
 

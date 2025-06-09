@@ -1,4 +1,4 @@
-package com.userservice.service;
+package com.userservice.service.RoleService;
 
 import com.userservice.model.Role;
 import com.userservice.repository.RoleRepository;
