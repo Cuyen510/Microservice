@@ -38,7 +38,7 @@ public class CartController {
     }
 
     @PostMapping("/{user_id}")
-    public ResponseEntity<?> addToCart(@PathVariable("user_id") Long userId, @RequestBody CartItemDTO cartItemDTO, BindingResult result) throws DataNotFoundException {
+    public ResponseEntity<?> addToCart(@PathVariable("user_id") Long userId, @RequestBody CartItemDTO cartItemDTO, BindingResult result) throws Exception {
         if (result.hasErrors()) {
             List<String> errorMessages = result.getFieldErrors().stream()
                     .map(FieldError::getDefaultMessage)
@@ -63,18 +63,18 @@ public class CartController {
     }
 
 
-    @PutMapping("")
-    public ResponseEntity<?> updateCart(@RequestBody CartDTO cartDTO) throws DataNotFoundException, ExecutionException, InterruptedException, TimeoutException {
-        CompletableFuture<String> future = new CompletableFuture<>();
-        kafkaBridgeService.put(String.valueOf(cartDTO.getUserId()), future);
-        kafkaTemplate.send(productStockRequest, cartDTO.getUserId()+"-"+cartDTO.getCartItems().toString());
-
-        String response = future.get(5, TimeUnit.SECONDS);
-        if (!response.equals("ok")) {
-            return ResponseEntity.badRequest().body(UpdateCartResponse.builder().message("Not enough stock: " + response).build());
-        }
-        return ResponseEntity.ok().body(UpdateCartResponse.builder().cart(cartService.updateCart(cartDTO)).message("Cart updated").build());
-    }
+//    @PutMapping("")
+//    public ResponseEntity<?> updateCart(@RequestBody CartDTO cartDTO) throws DataNotFoundException, ExecutionException, InterruptedException, TimeoutException {
+//        CompletableFuture<String> future = new CompletableFuture<>();
+//        kafkaBridgeService.put(String.valueOf(cartDTO.getUserId()), future);
+//        kafkaTemplate.send(productStockRequest, cartDTO.getUserId()+"-"+cartDTO.getCartItems().toString());
+//
+//        String response = future.get(5, TimeUnit.SECONDS);
+//        if (!response.equals("ok")) {
+//            return ResponseEntity.badRequest().body(UpdateCartResponse.builder().message("Not enough stock: " + response).build());
+//        }
+//        return ResponseEntity.ok().body(UpdateCartResponse.builder().cart(cartService.updateCart(cartDTO)).message("Cart updated").build());
+//    }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteCartItems(@PathVariable("id") Long userId) throws DataNotFoundException {

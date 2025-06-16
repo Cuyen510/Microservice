@@ -59,7 +59,7 @@ public class Order {
 
     private Boolean active;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<OrderDetail> orderDetails;
 }

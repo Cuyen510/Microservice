@@ -6,10 +6,13 @@ import com.orderservice.exceptions.DataNotFoundException;
 import com.orderservice.model.Cart;
 import com.orderservice.model.CartItem;
 
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
+
 public interface ICartService {
     Cart createCart(Long userId);
 
-    CartItem addToCart(Long userId, CartItemDTO cartItemDTO) throws DataNotFoundException;
+    CartItem addToCart(Long userId, CartItemDTO cartItemDTO) throws Exception;
 
     CartItem updateCartItem(Long userId, CartItemDTO cartItemDTO) throws DataNotFoundException;
 

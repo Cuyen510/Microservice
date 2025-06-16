@@ -14,10 +14,12 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import reactor.core.publisher.Mono;
 
+import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 @Component
 public class AuthFilter extends AbstractGatewayFilterFactory<AuthFilter.Config> {
@@ -42,50 +44,59 @@ public class AuthFilter extends AbstractGatewayFilterFactory<AuthFilter.Config> 
     public GatewayFilter apply(Config config) {
         return (exchange, chain) -> {
             if (!exchange.getRequest().getHeaders().containsKey(HttpHeaders.AUTHORIZATION)) {
-                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Missing authorization information");
+                return Mono.error(new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Missing authorization information"));
             }
 
             String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
             if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid authorization structure");
+                return Mono.error(new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid authorization structure"));
             }
 
             String token = authHeader.substring(7);
+            DecodedJWT decodedJWT;
             try {
                 Algorithm algorithm = Algorithm.HMAC256(jwtSecret.getBytes());
-                DecodedJWT decodedJWT = JWT.require(algorithm).build().verify(token);
-                String username = decodedJWT.getSubject();
-                String role = decodedJWT.getClaim("role").asString();
-                String userId = decodedJWT.getClaim("userId").asString();
-
-                if (username == null || username.isEmpty() || role == null) {
-                    throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid token");
-                }
-
-                CompletableFuture<Boolean> future = new CompletableFuture<>();
-                validationResults.put(username, future);
-                kafkaTemplate.send(validateUserTopic, username);
-
-                Boolean isValid = future.get(10, TimeUnit.SECONDS);
-
-                if (!isValid) {
-                    throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found");
-                }
-
-                ServerHttpRequest request = exchange.getRequest().mutate()
-                        .header("X-auth-user", username)
-                        .header("X-auth-userId", userId)
-                        .header("X-auth-role", role)
-                        .build();
-                return chain.filter(exchange.mutate().request(request).build());
-
+                decodedJWT = JWT.require(algorithm).build().verify(token);
             } catch (JWTVerificationException e) {
-                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token verification failed");
-            } catch (Exception e) {
-                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User validation timeout");
+                return Mono.error(new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token verification failed"));
             }
+
+            String username = decodedJWT.getSubject();
+            String role = decodedJWT.getClaim("role").asString();
+            String userId = decodedJWT.getClaim("userId").asString();
+
+            if (username == null || username.isEmpty() || role == null) {
+                return Mono.error(new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid token"));
+            }
+
+            CompletableFuture<Boolean> future = new CompletableFuture<>();
+            validationResults.put(username, future);
+            kafkaTemplate.send(validateUserTopic, username);
+
+            return Mono.fromFuture(() -> future)
+                    .timeout(Duration.ofSeconds(20))
+                    .flatMap(isValid -> {
+                        if (!isValid) {
+                            return Mono.error(new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found"));
+                        }
+
+                        ServerHttpRequest request = exchange.getRequest().mutate()
+                                .header("X-auth-user", username)
+                                .header("X-auth-userId", userId)
+                                .header("X-auth-role", role)
+                                .build();
+
+                        return chain.filter(exchange.mutate().request(request).build());
+                    })
+                    .onErrorMap(ex -> {
+                        if (ex instanceof TimeoutException) {
+                            return new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User validation timeout");
+                        }
+                        return ex;
+                    });
         };
     }
+
 
 
     @KafkaListener(topics = "${kafka.topic.validateUserResponse}", groupId = "gateway-group")

@@ -7,10 +7,19 @@ import com.orderservice.model.Cart;
 import com.orderservice.model.CartItem;
 import com.orderservice.repository.CartItemRepository;
 import com.orderservice.repository.CartRepository;
+import com.orderservice.response.UpdateCartResponse;
+import com.orderservice.service.KafkaBridgeService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 
 @Service
@@ -18,35 +27,57 @@ import java.util.List;
 public class CartService implements ICartService{
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
+    private final KafkaTemplate<String, String> kafkaTemplate;
+
+    private final KafkaBridgeService kafkaBridgeService;
+
+    @Value("${kafka.topic.productStockRequest}")
+    private String productStockRequest;
     public Cart createCart(Long userId){
         Cart cart = new Cart();
         cart.setUserId(userId);
         return cartRepository.save(cart);
     }
 
-    public CartItem addToCart(Long userId, CartItemDTO cartItemDTO) throws DataNotFoundException {
+    public CartItem addToCart(Long userId, CartItemDTO cartItemDTO) throws Exception {
         Cart cart =  cartRepository.findByUserId(userId).orElseThrow(()-> new DataNotFoundException("Cant find cart"));
         List<Long> productIds = cart.getCartItems()
                 .stream()
                 .map(CartItem::getProductId)
                 .toList();
         CartItem cartItem;
+        CompletableFuture<String> future = new CompletableFuture<>();
+        kafkaBridgeService.put(String.valueOf(userId), future);
+
         if(productIds.contains(cartItemDTO.getProductId())){
             cartItem = cartItemRepository.findByProductIdAndCartId(cartItemDTO.getProductId(), cart.getId()).orElseThrow(() -> new DataNotFoundException("Cant find cart"));
-            cartItem.setQuantity(cartItem.getQuantity()+cartItemDTO.getQuantity());
+            int quantity = cartItemDTO.getQuantity()+cartItem.getQuantity();
+            cartItemDTO.setQuantity(quantity);
+            kafkaTemplate.send(productStockRequest, userId + "-" +"["+ cartItemDTO.toString()+"]");
+
+            String response = future.get(10, TimeUnit.SECONDS);
+            if (!response.equals("ok")) {
+                throw new Exception("Not enough stock");
+            }else cartItem.setQuantity(quantity);
         }else{
-            cartItem = new CartItem();
-            cartItem.setCart(cart);
-            cartItem.setPrice(cartItemDTO.getPrice());
-            cartItem.setProductId(cartItemDTO.getProductId());
-            cartItem.setQuantity(cartItemDTO.getQuantity());
+            kafkaTemplate.send(productStockRequest, userId + "-" +"["+ cartItemDTO.toString()+"]");
+            String response = future.get(10, TimeUnit.SECONDS);
+            if (!response.equals("ok")) {
+                throw new Exception("Not enough stock");
+            }else {
+                cartItem = new CartItem();
+                cartItem.setCart(cart);
+                cartItem.setPrice(cartItemDTO.getPrice());
+                cartItem.setProductId(cartItemDTO.getProductId());
+                cartItem.setQuantity(cartItemDTO.getQuantity());
+            }
         }
         return cartItemRepository.save(cartItem);
     }
 
     public CartItem updateCartItem(Long userId, CartItemDTO cartItemDTO) throws DataNotFoundException {
         Cart cart = cartRepository.findByUserId(userId).orElseThrow(()-> new DataNotFoundException("cant find user"));
-        CartItem cartItem = cartItemRepository.findByProductIdAndCartId(cartItemDTO.getProductId(), cart.getId()).orElseThrow(()-> new DataNotFoundException("cant find user"));
+        CartItem cartItem = cartItemRepository.findByProductIdAndCartId(cartItemDTO.getProductId(), cart.getId()).orElseThrow(()-> new DataNotFoundException("cant find product"));
         if(cartItemDTO.getQuantity() == 0) cartItemRepository.delete(cartItem);
         else{
             cartItem.setQuantity(cartItemDTO.getQuantity());
