@@ -147,8 +147,7 @@ export class CartComponent {
             }
           }
          
-        },
-        error: err => this.snackBar.open(err.error.message || 'An error occurred', 'Close', { duration: 3000 })
+        }
     });
     this.getCart();
   }

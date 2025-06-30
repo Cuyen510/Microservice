@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { TokenService } from '../../service/token.service';
+import { Role } from '../../model/role';
 
 
 
@@ -21,6 +22,7 @@ export class HeaderComponent  {
   isLoggedIn: boolean = false; 
   username: string = '';
   user_id: number = 0;
+  role: Role = {id: 0, name: ''};
   constructor(private tokenService: TokenService) { 
     this.checkLoginStatus();
   }
@@ -32,6 +34,7 @@ export class HeaderComponent  {
     if (this.isLoggedIn) {
       this.username = this.tokenService.getUser().fullname; 
       this.user_id = this.tokenService.getUserId();
+      this.role = this.tokenService.getUserRole();
     }
   }
 

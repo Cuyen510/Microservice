@@ -8,6 +8,8 @@ import { OrderComponent } from './component/order/order.component';
 import { OrderDetailComponent } from './component/order-detail/order-detail.component';
 import { UserProfileComponent } from './component/user-profile/user-profile.component';
 import { UserProductComponent } from './component/user-product/user-product.component';
+import { ManageUserComponent } from './component/manage-user/manage-user.component';
+import { AddProductComponent } from './component/add-product/add-product.component';
 
 export const routes: Routes = [
     { path: '', component: HomeComponent },
@@ -19,4 +21,6 @@ export const routes: Routes = [
     { path: 'order_details/:order_id', component: OrderDetailComponent},
     { path: 'user_profile', component: UserProfileComponent},
     { path: 'user_product/:user_id', component: UserProductComponent},
+    { path: 'add_product', component: AddProductComponent},
+    { path: 'user', component: ManageUserComponent},
 ];

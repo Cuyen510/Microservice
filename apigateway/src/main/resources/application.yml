@@ -42,7 +42,7 @@
           - id: user-protected-routes
             uri: http://localhost:9002
             predicates:
-              - Path=/api/v1/users/{id}, /api/v1/users,
+              - Path=/api/v1/users/{id}, /api/v1/users, /api/v1/users/add
             filters:
               - AuthFilter
 

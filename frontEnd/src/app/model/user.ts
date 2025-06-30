@@ -7,6 +7,7 @@ export interface User{
     address:string;
     active: boolean;
     date_of_birth: Date;
+    password: string;
     role: Role;    
 }
 

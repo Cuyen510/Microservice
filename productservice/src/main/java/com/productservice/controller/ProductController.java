@@ -35,7 +35,7 @@ public class ProductController {
     private final IProductService productService;
 
     @PostMapping(value = "")
-    public ResponseEntity<?> createProduct(
+    public ResponseEntity<?> addProduct(
             @Valid @RequestBody ProductDTO productDTO,
             BindingResult result
     ) {
@@ -47,7 +47,7 @@ public class ProductController {
                         .toList();
                 return ResponseEntity.badRequest().body(errorMessages);
             }
-            Product newProduct = productService.createProduct(productDTO);
+            Product newProduct = productService.addProduct(productDTO);
             return ResponseEntity.ok(newProduct);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -78,7 +78,7 @@ public class ProductController {
                             .body("file must be an image");
                 }
                 String filename = storeFile(file);
-                ProductImage productImage = productService.createProductImage(
+                ProductImage productImage = productService.addProductImage(
                         existingProduct.getId(),
                         ProductImageDTO.builder()
                                 .imageUrl(filename)

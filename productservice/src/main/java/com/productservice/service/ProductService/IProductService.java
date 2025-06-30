@@ -14,7 +14,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface IProductService {
-    Product createProduct(ProductDTO productDTO) throws DataNotFoundException;
+    Product addProduct(ProductDTO productDTO) throws DataNotFoundException;
 
     Product getProductById(Long id) throws DataNotFoundException;
 
@@ -26,7 +26,7 @@ public interface IProductService {
 
     void deleteProduct(Long id);
 
-    ProductImage createProductImage(Long productId, ProductImageDTO productImageDTO) throws DataNotFoundException, InvalidParamException;
+    ProductImage addProductImage(Long productId, ProductImageDTO productImageDTO) throws DataNotFoundException, InvalidParamException;
 
     Page<Product> getProductByUserId(Long userId, Pageable pageable);
 

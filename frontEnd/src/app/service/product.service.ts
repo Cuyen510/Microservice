@@ -9,21 +9,20 @@ import { ProductListResponse } from '../response/product/product.list.response';
 import { Product } from '../model/product';
 
 @Injectable({
-  providedIn: 'root', 
+  providedIn: 'root',
 })
 export class ProductService {
   private apiBaseUrl = environment.apiBaseUrl;
-  constructor(private http : HttpClient) { }
+  constructor(private http: HttpClient) {}
 
-  getProducts(
-    page: number,
-    limit: number
-  ): Observable<ProductListResponse> {
+  getProducts(page: number, limit: number): Observable<ProductListResponse> {
     const params = {
       page: page,
-      limit: limit
+      limit: limit,
     };
-    return this.http.get<ProductListResponse>(`${this.apiBaseUrl}/products`, { params });
+    return this.http.get<ProductListResponse>(`${this.apiBaseUrl}/products`, {
+      params,
+    });
   }
 
   searchProducts(
@@ -36,52 +35,78 @@ export class ProductService {
       keyword: keyword,
       category_id: categoryId.toString(),
       page: page,
-      limit: limit
+      limit: limit,
     };
-    return this.http.get<ProductListResponse>(`${this.apiBaseUrl}/products/search`, { params });
+    return this.http.get<ProductListResponse>(
+      `${this.apiBaseUrl}/products/search`,
+      { params }
+    );
   }
 
   getDetailProduct(productId: number): Observable<ApiResponse> {
-    return this.http.get<ApiResponse>(`${this.apiBaseUrl}/products/${productId}`);
+    return this.http.get<ApiResponse>(
+      `${this.apiBaseUrl}/products/${productId}`
+    );
   }
 
   getProductImages(imageName: string): Observable<any> {
-    return this.http.get<any>(`${this.apiBaseUrl}/products/images/${imageName}`);
+    return this.http.get<any>(
+      `${this.apiBaseUrl}/products/images/${imageName}`
+    );
   }
 
   getProductsByIds(productIds: number[]): Observable<Product[]> {
     const params = new HttpParams().set('ids', productIds.join(','));
-    return this.http.get<Product[]>(`${this.apiBaseUrl}/products/by-ids?`+ params);
+    return this.http.get<Product[]>(
+      `${this.apiBaseUrl}/products/by-ids?` + params
+    );
   }
 
-  getProductsByUserId(userId: number, page: number, limit: number): Observable<Product[]> {
+  getProductsByUserId(
+    userId: number,
+    page: number,
+    limit: number
+  ): Observable<Product[]> {
     const params = {
       userId: userId,
       page: page,
-      limit: limit
+      limit: limit,
     };
-    return this.http.get<Product[]>(`${this.apiBaseUrl}/products/user`, {params});
+    return this.http.get<Product[]>(`${this.apiBaseUrl}/products/user`, {
+      params,
+    });
   }
 
   deleteProduct(productId: number): Observable<ApiResponse> {
-    debugger
-    return this.http.delete<ApiResponse>(`${this.apiBaseUrl}/products/${productId}`);
+    debugger;
+    return this.http.delete<ApiResponse>(
+      `${this.apiBaseUrl}/products/${productId}`
+    );
   }
-  updateProduct(productId: number, updatedProduct: UpdateProductDTO): Observable<ApiResponse> {
-    return this.http.put<ApiResponse>(`${this.apiBaseUrl}/products/${productId}`, updatedProduct);
-  }  
-  insertProduct(insertProductDTO: InsertProductDTO): Observable<ApiResponse> {
-    return this.http.post<ApiResponse>(`${this.apiBaseUrl}/products`, insertProductDTO);
+  updateProduct(
+    productId: number,
+    updatedProduct: UpdateProductDTO
+  ): Observable<ApiResponse> {
+    return this.http.put<ApiResponse>(
+      `${this.apiBaseUrl}/products/${productId}`,
+      updatedProduct
+    );
   }
-  uploadImages(productId: number, files: File[]): Observable<ApiResponse> {
+  insertProduct(insertProductDTO: InsertProductDTO): Observable<any> {
+    return this.http.post<any>(`${this.apiBaseUrl}/products`, insertProductDTO);
+  }
+  uploadImages(productId: number, files: File[]): Observable<any> {
     const formData = new FormData();
     for (let i = 0; i < files.length; i++) {
       formData.append('files', files[i]);
     }
-    return this.http.post<ApiResponse>(`${this.apiBaseUrl}/products/uploads/${productId}`, formData);
+    return this.http.post<any>(
+      `${this.apiBaseUrl}/products/uploads/${productId}`,
+      formData
+    );
   }
   deleteProductImage(id: number): Observable<any> {
-    debugger
+    debugger;
     return this.http.delete<string>(`${this.apiBaseUrl}/product_images/${id}`);
   }
 }

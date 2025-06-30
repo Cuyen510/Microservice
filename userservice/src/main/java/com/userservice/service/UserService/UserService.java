@@ -2,6 +2,7 @@ package com.userservice.service.UserService;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.userservice.dto.AddUserDTO;
 import com.userservice.model.User;
 import com.userservice.repository.RoleRepository;
 import com.userservice.repository.UserRepository;
@@ -12,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -22,7 +25,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class UserService implements IUserService{
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
@@ -35,7 +38,7 @@ public class UserService {
     private String jwtSecret;
 
 
-    public User addUser(UserDTO userDTO){
+    public User registerUser(UserDTO userDTO){
         String phoneNumber = userDTO.getPhoneNumber();
         if(userRepository.existsByPhoneNumber(phoneNumber)){
             throw new DataIntegrityViolationException("phone number already exists");
@@ -50,8 +53,23 @@ public class UserService {
         return user;
     }
 
-    public List<User> getAllUsers(){
-        return userRepository.findAll();
+    public User addUser(AddUserDTO addUserDTO){
+        String phoneNumber = addUserDTO.getPhoneNumber();
+        if(userRepository.existsByPhoneNumber(phoneNumber)){
+            throw new DataIntegrityViolationException("phone number already exists");
+        }
+        User user = addUserDTO.dtoToEntity(addUserDTO);
+        user.setPassword(passwordEncoder.encode(addUserDTO.getPassword()));
+        user.setActive(true);
+        user.setRole(roleRepository.findByName(addUserDTO.getRole()));
+
+        userRepository.save(user);
+        kafkaTemplate.send(createCart, String.valueOf(user.getId()));
+        return user;
+    }
+
+    public Page<User> getAllUsers(PageRequest pageRequest){
+        return userRepository.findAll(pageRequest);
     }
 
     public String getUserAddress(Long id) throws DataNotFoundException {
@@ -74,14 +92,6 @@ public class UserService {
                     .withClaim("userId", user.getId().toString())
                     .withExpiresAt(new Date(System.currentTimeMillis()+ (24*60*60*1000)))
                     .sign(algorithm);
-
-
-//            String refresh_token = JWT.create()
-//                    .withSubject(user.getPhoneNumber())
-//                    .withClaim("role", user.getRole().getName())
-//                    .withClaim("userId", user.getId().toString())
-//                    .withExpiresAt(new Date(System.currentTimeMillis()+ (7*24*60*60*1000)))
-//                    .sign(algorithm);
 
             return UserLoginResponse.builder()
                     .access_token(access_token)

@@ -64,11 +64,9 @@ export class LoginComponent {
             this.tokenService.saveToken(response.access_token);
             this.tokenService.saveUser(response.user)
         }
-          if(this.tokenService.getUserRole().name == "admin"){
-            this.router.navigate(['/admin/dashboard']);  
-            }else{
-            this.router.navigate(['']);  
-          }
+          
+          this.router.navigate(['']);  
+            
         },
         complete: () =>{
           debugger

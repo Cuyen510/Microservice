@@ -1,12 +1,19 @@
 package com.userservice.controller;
 
+import com.userservice.dto.AddUserDTO;
 import com.userservice.dto.UserLoginDTO;
 import com.userservice.exceptions.DataNotFoundException;
 import com.userservice.dto.UserDTO;
+import com.userservice.model.User;
 import com.userservice.response.UserAddressResponse;
-import com.userservice.service.UserService.UserService;
+import com.userservice.response.UserListResponse;
+import com.userservice.response.UserResponse;
+import com.userservice.service.UserService.IUserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -19,10 +26,10 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("api/v1/users")
 public class UserController {
-    private final UserService userService;
+    private final IUserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<?> addUser(@RequestBody UserDTO userDTO, BindingResult result){
+    public ResponseEntity<?> registerUser(@RequestBody UserDTO userDTO, BindingResult result){
         try {
             if(result.hasErrors()) {
                 List<String> errorMessages = result.getFieldErrors()
@@ -31,14 +38,29 @@ public class UserController {
                         .toList();
                 return ResponseEntity.badRequest().body(errorMessages);
             }
-            return ResponseEntity.ok().body(userService.addUser(userDTO));
+            return ResponseEntity.ok().body(userService.registerUser(userDTO));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/add")
+    public ResponseEntity<?> addUser(@RequestBody AddUserDTO addUserDTO, BindingResult result){
+        try {
+            if(result.hasErrors()) {
+                List<String> errorMessages = result.getFieldErrors()
+                        .stream()
+                        .map(FieldError::getDefaultMessage)
+                        .toList();
+                return ResponseEntity.badRequest().body(errorMessages);
+            }
+            return ResponseEntity.ok().body(userService.addUser(addUserDTO));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
 
 
     }
-
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody UserLoginDTO userLoginDTO, BindingResult result) {
         try {
@@ -72,11 +94,28 @@ public class UserController {
     }
 
     @GetMapping("")
-    public ResponseEntity<?> getAllUsers(HttpServletRequest request) {
+    public ResponseEntity<?> getAllUsers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int limit,
+            HttpServletRequest request) {
             String role = request.getHeader("X-auth-role");
             if(!role.equals("admin"))
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("UnAuthorize");
-            return ResponseEntity.ok().body(userService.getAllUsers());
+            PageRequest pageRequest = PageRequest.of(
+                    page, limit,
+                    Sort.by("id").ascending()
+            );
+            Page<User> userPage = userService.getAllUsers(pageRequest);
+            int totalPages = userPage.getTotalPages();
+            List<UserResponse> users = userPage.getContent()
+                    .stream()
+                    .map(UserResponse::fromUser)
+                    .toList();
+            return ResponseEntity.ok(UserListResponse
+                    .builder()
+                    .users(users)
+                    .totalPages(totalPages)
+                    .build());
     }
 
     @PutMapping("/{id}")

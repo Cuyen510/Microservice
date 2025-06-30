@@ -71,7 +71,7 @@ public class AuthFilter extends AbstractGatewayFilterFactory<AuthFilter.Config> 
 
             CompletableFuture<Boolean> future = new CompletableFuture<>();
             validationResults.put(username, future);
-            kafkaTemplate.send(validateUserTopic, username);
+            kafkaTemplate.send(validateUserTopic, username+"-"+role);
 
             return Mono.fromFuture(() -> future)
                     .timeout(Duration.ofSeconds(20))

@@ -4,15 +4,16 @@ import { Observable } from 'rxjs';
 import { RegisterDTO } from '../dto/user/register.dto';
 import { LoginDTO } from '../dto/user/login.dtos';
 import { environment } from '../environment/environment';
-import { ApiResponse } from '../response/api.response';
-import { UserResponse } from '../response/user/user.response';
 import { UpdateUserDTO } from '../dto/user/update.user.dto';
+import { User } from '../model/user';
+import { AddUserDTO } from '../dto/user/add.user.dto';
 
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
+  
 
   private apiRegister= `${environment.apiBaseUrl}/users/register`;
   private apiLogin= `${environment.apiBaseUrl}/users/login`;
@@ -70,5 +71,33 @@ export class UserService {
     }
   }
 
+  getAllUsers(token: string, currentPage: number, pageSize: number): Observable<any>{
+    const params = {
+      page: currentPage,
+      limit: pageSize
+    };
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    });
+    return this.http.get<any>(`${this.apiUserDetail}`, {headers, params})
+  }
+
+  deleteUser(token: string, userId: number): Observable<any>{
+    const params = {userId: userId};
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    });   
+    return this.http.delete<any>(`${this.apiUserDetail}`, {headers, params})
+  }
+
+  addUser(token: string, user: AddUserDTO): Observable<any>{
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    });   
+    return this.http.post<any>(`${this.apiUserDetail}/add`,user, {headers})
+  }
   
 }

@@ -1,6 +1,6 @@
 <app-header></app-header>
 <div class="container">
-    <h1>My Cart</h1>
+  <h1>My Cart</h1>
 
   <table id="cart-table">
     <thead>
@@ -17,86 +17,129 @@
         <tr *ngFor="let item of sellerId.value">
           <td>
             <div class="product-info">
-              <img [src]="item.thumbnail" alt="Product Image" class="product-image">
+              <img
+                [src]="item.thumbnail"
+                alt="Product Image"
+                class="product-image"
+              />
               <span class="product-name">{{ item.name }}</span>
             </div>
           </td>
-          <td>{{ item.price | number:'1.2-2' }}</td>
+          <td>{{ item.price | number : "1.2-2" }}</td>
           <td>
             <button (click)="decreaseQuantity(item)">−</button>
             <span class="mx-2">{{ item.quantity }}</span>
             <button (click)="increaseQuantity(item)">+</button>
           </td>
-          <td>${{ (item.price * item.quantity) | number:'1.2-2' }}</td>
+          <td>${{ item.price * item.quantity | number : "1.2-2" }}</td>
         </tr>
       </ng-container>
     </tbody>
   </table>
-  
+
   <div class="text-start mt-3">
-    <h4 class="header-text text-end ">Total: ${{ totalAmount | number:'1.2-2'}}</h4>
+    <h4 class="header-text text-end">
+      Total: ${{ totalAmount | number : "1.2-2" }}
+    </h4>
   </div>
-  <button (click)="placeOrder()">Place order</button>
+  <div class="mb-3 text-end">
+    <button (click)="placeOrder()">Place order</button>
+  </div>
   <form *ngIf="showOrderForm" [formGroup]="orderForm">
     <div class="row">
       <div class="col-md-6">
-          <h2 class="header">Your information</h2>
-              <div class="mb-3">
-                  <label for="phone" class="form-label">Phone number</label>
-                  <input type="text" 
-                      class="form-control" 
-                      formControlName="phone_number"                         
-                      placeholder="Phone number" 
-                      required
-                      id="phone" 
-                      [class.is-invalid]="orderForm.get('phone_number')!.invalid && orderForm.get('phone_number')!.touched">
-                      <div *ngIf="orderForm.get('phone_number')!.invalid && orderForm.get('phone_number')!.touched" class="invalid-feedback">
-                      Phone number is at least 5 characters.
-                  </div>
-              </div>
-              <div class="mb-3">
-              </div>
-              <div class="mb-3">
-                  <label for="shipping-address" class="form-label">Shipping address</label>
-                  <input type="text" 
-                      class="form-control" 
-                      formControlName="shipping_address"                         
-                      placeholder="shipping-address" 
-                      required
-                      id="shipping-address" 
-                      [class.is-invalid]="orderForm.get('shipping_address')!.invalid && orderForm.get('shipping_address')!.touched">
-                  <div *ngIf="orderForm.get('shipping_address')!.invalid && orderForm.get('shipping_address')!.touched" class="invalid-feedback">
-                      Invalid address.
-                  </div>
-              </div>
-              <div class="mb-3">
-                  <label for="note" class="form-label">Note</label>
-                  <input type="text" 
-                      class="form-control" 
-                      formControlName="note"                                                 
-                      placeholder="Note" 
-                      required
-                      id="note">
-              </div>
-              <div class="mb-3">
-                  <label for="shippingMethod">Shipping method</label>
-                  <select class="form-control" id="shippingMethod" 
-                      formControlName="shipping_method">
-                      <option value="express">Express</option>
-                      <option value="normal">Normal</option>
-                  </select>
-              </div>
-              <div class="mb-3">
-                  <label for="paymentMethod">Payment method</label>
-                  <select class="form-control" id="paymentMethod"
-                      formControlName="payment_method">                     
-                      <option value="cod">COD</option>
-                      <option value="other">other</option>
-                  </select>
-              </div>
-      </div>  
+        <h2 class="header">Your information</h2>
+        <div class="mb-3">
+          <label for="phone" class="form-label">Phone number</label>
+          <input
+            type="text"
+            class="form-control"
+            formControlName="phone_number"
+            placeholder="Phone number"
+            required
+            id="phone"
+            [class.is-invalid]="
+              orderForm.get('phone_number')!.invalid &&
+              orderForm.get('phone_number')!.touched
+            "
+          />
+          <div
+            *ngIf="
+              orderForm.get('phone_number')!.invalid &&
+              orderForm.get('phone_number')!.touched
+            "
+            class="invalid-feedback"
+          >
+            Phone number is at least 5 characters.
+          </div>
+        </div>
+        <div class="mb-3"></div>
+        <div class="mb-3">
+          <label for="shipping-address" class="form-label"
+            >Shipping address</label
+          >
+          <input
+            type="text"
+            class="form-control"
+            formControlName="shipping_address"
+            placeholder="shipping-address"
+            required
+            id="shipping-address"
+            [class.is-invalid]="
+              orderForm.get('shipping_address')!.invalid &&
+              orderForm.get('shipping_address')!.touched
+            "
+          />
+          <div
+            *ngIf="
+              orderForm.get('shipping_address')!.invalid &&
+              orderForm.get('shipping_address')!.touched
+            "
+            class="invalid-feedback"
+          >
+            Invalid address.
+          </div>
+        </div>
+        <div class="mb-3">
+          <label for="note" class="form-label">Note</label>
+          <input
+            type="text"
+            class="form-control"
+            formControlName="note"
+            placeholder="Note"
+            required
+            id="note"
+          />
+        </div>
+        <div class="mb-3">
+          <label for="shippingMethod">Shipping method</label>
+          <select
+            class="form-control"
+            id="shippingMethod"
+            formControlName="shipping_method"
+          >
+            <option value="express">Express</option>
+            <option value="normal">Normal</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label for="paymentMethod">Payment method</label>
+          <select
+            class="form-control"
+            id="paymentMethod"
+            formControlName="payment_method"
+          >
+            <option value="cod">COD</option>
+            <option value="other">other</option>
+          </select>
+        </div>
+      </div>
     </div>
   </form>
-  <button *ngIf="showOrderForm" (click)="confirmOrder()">Confirm order</button>
+  <div class="mb-3 text-end">
+    <button *ngIf="showOrderForm" (click)="confirmOrder()">
+      Confirm order
+    </button>
+  </div>
 </div>
 <app-footer></app-footer>

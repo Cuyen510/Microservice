@@ -4,7 +4,7 @@ export interface UserResponse {
     fullname: string;
     phone_number: string;
     address:string;
-    is_active: boolean;
+    isActive: boolean;
     date_of_birth: Date;
     role: Role;    
 }

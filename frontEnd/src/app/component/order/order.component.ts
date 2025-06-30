@@ -61,7 +61,6 @@ export class OrderComponent {
       next: (response: any)=>{
         this.orders = response.orders;
         this.totalPages = response.totalPages;
-        // this.visiblePages = this.generateVisiblePageArray(this.currentPage, this.totalPages);
         this.visiblePages = this.getVisiblePages();
       },
       complete: () =>{},
@@ -85,7 +84,6 @@ export class OrderComponent {
         });  
         this.displayOrder = this.orders;   
         this.totalPages = Math.floor(this.orders.length/this.itemsPerPage);
-        // this.visiblePages = this.generateVisiblePageArray(this.currentPage, this.totalPages);
         this.visiblePages = this.getVisiblePages();
       },
       complete: () => {
@@ -107,27 +105,6 @@ export class OrderComponent {
     this.currentPage = page < 0 ? 0 : page; 
     this.updatePagedOrder();
   }
-
-  // onPageChange(page: number) {
-  //   debugger;
-  //   this.currentPage = page < 0 ? 0 : page;        
-  //   this.getAllOrders(this.tokenService.getUserId(), this.currentPage, this.itemsPerPage );
-  // }
-
-  // generateVisiblePageArray(currentPage: number, totalPages: number): number[] {
-  //   const maxVisiblePages = 5;
-  //   const halfVisiblePages = Math.floor(maxVisiblePages / 2);
-
-  //   let startPage = Math.max(currentPage - halfVisiblePages, 1);
-  //   let endPage = Math.min(startPage + maxVisiblePages - 1, totalPages);
-
-  //   if (endPage - startPage + 1 < maxVisiblePages) {
-  //     startPage = Math.max(endPage - maxVisiblePages + 1, 1);
-  //   }
-
-  //   return new Array(endPage - startPage + 1).fill(0)
-  //       .map((_, index) => startPage + index);
-  // }
 
   getVisiblePages(): number[] {
     const pages = [];

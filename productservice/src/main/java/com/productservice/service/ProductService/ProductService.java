@@ -29,13 +29,13 @@ public class ProductService implements IProductService {
     private final ProductImageRepository productImageRepository;
 
     @Override
-    public Product createProduct(ProductDTO productDTO) throws DataNotFoundException {
+    public Product addProduct(ProductDTO productDTO) throws DataNotFoundException {
         Category existingCategory = categoryRepository.findById(productDTO.getCategoryId())
                 .orElseThrow(()->new DataNotFoundException("Category not found with id:" +productDTO.getCategoryId()));
         Product newProduct = new Product();
         newProduct.setName(productDTO.getName());
         newProduct.setPrice(productDTO.getPrice());
-        newProduct.setThumbnail(productDTO.getThumbnail());
+        newProduct.setThumbnail("");
         newProduct.setDescription(productDTO.getDescription());
         newProduct.setCategory(existingCategory);
         newProduct.setStock(productDTO.getStock());
@@ -91,7 +91,7 @@ public class ProductService implements IProductService {
     }
 
     @Override
-    public ProductImage createProductImage(Long productId, ProductImageDTO productImageDTO) throws DataNotFoundException, InvalidParamException {
+    public ProductImage addProductImage(Long productId, ProductImageDTO productImageDTO) throws DataNotFoundException, InvalidParamException {
         Product existingProduct = productRepository.findById(productId)
                 .orElseThrow(()->new DataNotFoundException("product not found with id:" +productImageDTO.getProductId()));
 

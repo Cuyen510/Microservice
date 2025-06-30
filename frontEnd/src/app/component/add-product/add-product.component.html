@@ -1,0 +1,111 @@
+<app-header></app-header>
+<div class="container">
+  <div class="intro-section">
+    <h1>Add New Product</h1>
+  </div>
+
+  <form [formGroup]="productForm" (ngSubmit)="submitProduct()">
+    <div class="row">
+      <div class="col-md-6">
+        <h5>Product Images</h5>
+        <div class="mb-3">
+          <input
+            type="file"
+            (change)="onImageSelected($event)"
+            multiple
+            accept="image/*"
+            class="form-control"
+          />
+        </div>
+
+        <div class="row mt-3">
+          <div class="thumbnail-container">
+            <div class="thumbnail-item" *ngFor="let image of previewImages">
+              <img [src]="image" class="thumbnail-image" alt="Preview Image" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="product-detail-container">
+          <div class="product-detail">
+            <div class="mb-3">
+              <label class="form-label"><strong>Product Name</strong></label>
+              <input
+                type="text"
+                formControlName="name"
+                class="form-control"
+                [class.is-invalid]="
+                  productForm.get('name')?.invalid &&
+                  productForm.get('name')?.touched
+                "
+              />
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label"><strong>Description</strong></label>
+              <textarea
+                formControlName="description"
+                class="form-control"
+                [class.is-invalid]="
+                  productForm.get('description')?.invalid &&
+                  productForm.get('description')?.touched
+                "
+              ></textarea>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label"><strong>Price ($)</strong></label>
+              <input
+                type="number"
+                formControlName="price"
+                class="form-control"
+                [class.is-invalid]="
+                  productForm.get('price')?.invalid &&
+                  productForm.get('price')?.touched
+                "
+              />
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label"><strong>Stock</strong></label>
+              <input
+                type="number"
+                formControlName="stock"
+                class="form-control"
+                [class.is-invalid]="
+                  productForm.get('stock')?.invalid &&
+                  productForm.get('stock')?.touched
+                "
+              />
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label"><strong>Category</strong></label>
+              <select class="form-control" formControlName="category">
+                <option
+                  *ngFor="let category of categories"
+                  [value]="category.id"
+                >
+                  {{ category.name }}
+                </option>
+              </select>
+            </div>
+
+            <div class="product-actions">
+              <button
+                class="btn btn-success"
+                type="submit"
+                [disabled]="productForm.invalid"
+              >
+                Add Product
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+<app-footer></app-footer>

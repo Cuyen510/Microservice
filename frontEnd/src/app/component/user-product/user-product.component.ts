@@ -8,52 +8,58 @@ import { Product } from '../../model/product';
 import { ProductService } from '../../service/product.service';
 import { TokenService } from '../../service/token.service';
 import { environment } from '../../environment/environment';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-user-product',
-  imports: [CommonModule, FormsModule, HeaderComponent, FooterComponent, MatSnackBarModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    HeaderComponent,
+    FooterComponent,
+    MatSnackBarModule,
+  ],
   templateUrl: './user-product.component.html',
   styleUrl: './user-product.component.scss',
-  standalone: true
+  standalone: true,
 })
 export class UserProductComponent implements OnInit {
-
   products: Product[] = [];
-  pagedProducts: Product[] = [];
   currentPage = 0;
   pageSize = 5;
   totalPages = 0;
 
-  constructor(private productService: ProductService,
-              private tokenService: TokenService
+  constructor(
+    private productService: ProductService,
+    private tokenService: TokenService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
-    this.fetchUserProducts();
+    this.fetchUserProducts(1);
   }
 
-  fetchUserProducts(): void {
-    debugger
-    this.productService.getProductsByUserId(this.tokenService.getUserId(), this.currentPage, this.pageSize)
-    .subscribe((data: any) => {
-      this.products = data.products;
-      this.products.forEach(product => {
-        product.thumbnail = `${environment.apiBaseUrl}/products/images/${product.thumbnail}`
+  fetchUserProducts(page: number): void {
+    debugger;
+    this.productService
+      .getProductsByUserId(
+        this.tokenService.getUserId(),
+        this.currentPage,
+        this.pageSize
+      )
+      .subscribe((data: any) => {
+        this.products = data.products;
+        this.products.forEach((product) => {
+          product.thumbnail = `${environment.apiBaseUrl}/products/images/${product.thumbnail}`;
+        });
+        this.totalPages = data.totalPages;
       });
-      this.totalPages = data.totalPages;
-      this.updatePagedProducts();
-    });
-  }
-
-  updatePagedProducts(): void {
-    const start = (this.currentPage) * this.pageSize;
-    this.pagedProducts = this.products.slice(start, start + this.pageSize);
   }
 
   changePage(page: number): void {
     if (page < 0 || page > this.totalPages) return;
     this.currentPage = page;
-    this.updatePagedProducts();
+    this.fetchUserProducts(page);
   }
 
   getVisiblePages(): number[] {
@@ -75,6 +81,9 @@ export class UserProductComponent implements OnInit {
     return pages;
   }
 
+  addProduct() {
+    this.router.navigate(['/add_product']);
+  }
   deleteProduct(productId: number): void {
     console.log('Delete product with id', productId);
   }
