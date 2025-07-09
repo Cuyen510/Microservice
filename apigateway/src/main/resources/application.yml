@@ -30,24 +30,24 @@
       gateway:
         routes:
           - id: productservice
-            uri: http://localhost:9001
+            uri: lb://productservice
             predicates:
               - Path=/api/v1/products/**, /api/v1/categories/**
 
           - id: user-public-routes
-            uri: http://localhost:9002
+            uri: lb://userservice
             predicates:
               - Path=/api/v1/users/register, /api/v1/users/login, /api/v1/roles/**, /api/v1/users/userAddress
 
           - id: user-protected-routes
-            uri: http://localhost:9002
+            uri: lb://userservice
             predicates:
               - Path=/api/v1/users/{id}, /api/v1/users, /api/v1/users/add
             filters:
               - AuthFilter
 
           - id: order-protected-routes
-            uri: http://localhost:9003
+            uri: lb://orderservice
             predicates:
               - Path=/api/v1/orders/**, /api/v1/cart/**
             filters:
@@ -62,3 +62,8 @@
               allowedMethods: "*"
               allowedHeaders: "*"
 
+
+  eureka:
+    client:
+      service-url:
+        defaultZone: http://localhost:8761/eureka

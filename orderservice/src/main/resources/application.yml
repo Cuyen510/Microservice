@@ -18,7 +18,7 @@ spring:
         format-sql: true
 
 server:
-  port: 9003
+  port: ${PORT:9003}
 
 kafka:
   topic:
@@ -41,7 +41,25 @@ kafka:
     value-serializer: org.apache.kafka.common.serialization.StringDeserializer
 
 
-# eureka:
-#   client:
-#     service-url:
-#       defaultZone: http://localhost:8761/eureka
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+  instance:
+    instance-id: ${spring.application.name}:${random.value}
+    prefer-ip-address: true
+    lease-renewal-interval-in-seconds: 10
+    lease-expiration-duration-in-seconds: 30
+    health-check-url-path: /actuator/health
+  server:
+    peer-node-read-timeout-ms: 10000
+    peer-node-connect-timeout-ms: 5000
+    enable-self-preservation: true
+    eviction-interval-timer-in-ms: 60000
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, metrics

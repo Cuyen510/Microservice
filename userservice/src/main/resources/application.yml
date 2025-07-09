@@ -33,14 +33,27 @@ kafka:
     validateUserRequest: validate-user-request
     validateUserResponse: validate-user-response
     createCart: create-cart
-#eureka:
-#  client:
-#    service-url:
-#      defaultZone: http://localhost:8761/eureka
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+  instance:
+    instance-id: ${spring.application.name}:${random.value}
+    prefer-ip-address: true
+    lease-renewal-interval-in-seconds: 10
+    lease-expiration-duration-in-seconds: 30
+    health-check-url-path: /actuator/health
 
 server:
-  port: 9002
+  port: ${PORT:9002}
 
 security:
   jwt:
     secret: asdbsakjdbsjkacbacnlasknckjscnkjscbascscxsacasacadasd
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, metrics

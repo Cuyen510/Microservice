@@ -1,41 +1,42 @@
 <app-header></app-header>
 <div class="container">
   <h1>My Cart</h1>
-
-  <table id="cart-table">
-    <thead>
-      <tr>
-        <th>Product</th>
-        <th>Price</th>
-        <th>Quantity</th>
-        <th>Subtotal</th>
-      </tr>
-    </thead>
-    <tbody>
-      <ng-container *ngFor="let sellerId of groupedCartItems | keyvalue">
-        <h3>Seller ID: {{ sellerId.key }}</h3>
-        <tr *ngFor="let item of sellerId.value">
-          <td>
-            <div class="product-info">
-              <img
-                [src]="item.thumbnail"
-                alt="Product Image"
-                class="product-image"
-              />
-              <span class="product-name">{{ item.name }}</span>
-            </div>
-          </td>
-          <td>{{ item.price | number : "1.2-2" }}</td>
-          <td>
-            <button (click)="decreaseQuantity(item)">−</button>
-            <span class="mx-2">{{ item.quantity }}</span>
-            <button (click)="increaseQuantity(item)">+</button>
-          </td>
-          <td>${{ item.price * item.quantity | number : "1.2-2" }}</td>
+  <div class="container">
+    <table id="cart-table">
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Price</th>
+          <th>Quantity</th>
+          <th>Subtotal</th>
         </tr>
-      </ng-container>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+        <ng-container *ngFor="let sellerId of groupedCartItems | keyvalue">
+          <h3>Seller ID: {{ sellerId.key }}</h3>
+          <tr *ngFor="let item of sellerId.value">
+            <td>
+              <div class="product-info">
+                <img
+                  [src]="item.thumbnail"
+                  alt="Product Image"
+                  class="product-image"
+                />
+                <span class="product-name">{{ item.name }}</span>
+              </div>
+            </td>
+            <td>{{ item.price | number : "1.2-2" }}</td>
+            <td>
+              <button (click)="decreaseQuantity(item)">−</button>
+              <span class="mx-2">{{ item.quantity }}</span>
+              <button (click)="increaseQuantity(item)">+</button>
+            </td>
+            <td>${{ item.price * item.quantity | number : "1.2-2" }}</td>
+          </tr>
+        </ng-container>
+      </tbody>
+    </table>
+  </div>
 
   <div class="text-start mt-3">
     <h4 class="header-text text-end">

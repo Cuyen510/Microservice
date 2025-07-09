@@ -73,10 +73,7 @@ export class HomeComponent implements OnInit {
             element.url = `${environment.apiBaseUrl}/products/images/${element.thumbnail}`;
             this.products.push(element);
             this.totalPages = res.totalPages;
-            this.visiblePages = this.generateVisiblePageArray(
-              this.currentPage,
-              this.totalPages
-            );
+            this.visiblePages = this.getVisiblePages();
           });
         });
     }
@@ -90,34 +87,33 @@ export class HomeComponent implements OnInit {
         element.url = `${environment.apiBaseUrl}/products/images/${element.thumbnail}`;
         this.products.push(element);
         this.totalPages = res.totalPages;
-        this.visiblePages = this.generateVisiblePageArray(
-          this.currentPage,
-          this.totalPages
-        );
+        this.visiblePages = this.getVisiblePages();
       });
     });
   }
 
-  onPageChange(page: number) {
-    debugger;
-    this.currentPage = page;
+  changePage(page: number): void {
+    this.currentPage = page < 0 ? 0 : page;
     this.searchProducts();
   }
 
-  generateVisiblePageArray(currentPage: number, totalPages: number): number[] {
-    const maxVisiblePages = 5;
-    const halfVisiblePages = Math.floor(maxVisiblePages / 2);
+  getVisiblePages(): number[] {
+    const pages = [];
+    const total = this.totalPages;
+    const current = this.currentPage;
+    const maxVisible = 5;
 
-    let startPage = Math.max(currentPage - halfVisiblePages, 1);
-    let endPage = Math.min(startPage + maxVisiblePages - 1, totalPages);
+    let start = Math.max(1, current - Math.floor(maxVisible / 2));
+    let end = Math.min(total, start + maxVisible - 1);
 
-    if (endPage - startPage + 1 < maxVisiblePages) {
-      startPage = Math.max(endPage - maxVisiblePages + 1, 1);
+    if (end - start < maxVisible - 1) {
+      start = Math.max(1, end - maxVisible + 1);
     }
 
-    return new Array(endPage - startPage + 1)
-      .fill(0)
-      .map((_, index) => startPage + index);
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+    return pages;
   }
 
   onProductClick(productId: number) {
